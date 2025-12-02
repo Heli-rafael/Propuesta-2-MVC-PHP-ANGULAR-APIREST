@@ -23,6 +23,10 @@
   font-family: 'Poppins', sans-serif !important;
 }
 
+.pi {
+  font-family: 'primeicons' !important;
+}
+
 .menu-btn {
   width: 100%;
   justify-content: flex-start;
