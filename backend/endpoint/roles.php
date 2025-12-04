@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 require_once '../componentes/roles.php';
-require_once '../validations/roles.php';
+require_once '../validations/roles.validations.php';
 
 $roles = new Roles();
 $accion = $_GET['accion'] ?? '';
@@ -52,4 +52,5 @@ switch($accion) {
         echo json_encode(['error' => 'Acción no válida']);
 }
 
+?>
 

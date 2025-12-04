@@ -1,0 +1,179 @@
+<div style="
+  width: 90%; 
+  margin: auto; 
+  display: flex; 
+  gap: 20px; 
+  justify-content: space-between;
+  margin-top: 20px;
+">
+  <div style="
+    flex: 1;
+    background: #F8FAFC;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  ">
+    <div>
+      <i class="pi pi-users" style="font-size: 2.5rem; color: #334155;"></i>
+      <div style="font-weight: bold; font-size: 16px; margin-top: 8px;">
+        Total Clientes
+      </div>
+    </div>
+
+    <div style="font-size: 32px; font-weight: bold; color: #334155;">
+      {{ totalClientes }}
+    </div>
+  </div>
+</div>
+
+<div style="width: 90%; margin: auto; padding: 3% 0;">
+  <div style="display: flex; align-items: center; justify-content: space-between; gap: 20px;">
+
+    <!-- Busqueda -->
+    <div style="flex: 1;">
+      <input
+        pInputText
+        [(ngModel)]="busqueda"
+        placeholder="Buscar cliente..."
+        (input)="filtrar()"
+        style="width: 100%; padding: 8px; border-radius: 4px;"
+      />
+    </div>
+
+    <!-- Botón agregar -->
+    <button pButton label="Agregar Cliente" icon="pi pi-plus" (click)="abrirModalAgregar()"></button>
+  </div>
+</div>
+
+<div style="width: 90%; margin: auto; display: flex; gap: 20px; flex-wrap: wrap;">
+  <p-card *ngFor="let c of clientesFiltrados" [style]="{'width':'340px'}">
+
+    <!-- Encabezado: ícono de usuario y nombre -->
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 15px;">
+      <i class="pi pi-user" style="font-size: 2.5rem"></i>
+      <div style="flex: 1; font-weight: bold;">
+        {{ c.nombre }} {{ c.apellidos }}<br>
+        (CLI-{{ c.id | number:'3.0' }})
+      </div>
+    </div>
+
+    <!-- Detalles del cliente en dos columnas -->
+    <div style="display: grid; grid-template-columns: 120px auto; row-gap: 10px; font-size: 14px; margin: 15px 0;">
+        <div><strong>Teléfono:</strong></div>
+        <div style="text-align: right;">{{ c.telefono }}</div>
+
+        <div><strong>DNI:</strong></div>
+        <div style="text-align: right;">{{ c.dni }}</div>
+
+        <div><strong>Correo:</strong></div>
+        <div style="text-align: right;">{{ c.correo }}</div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div style="display: flex; gap: 5px;">
+      <button 
+        pButton 
+        label="Editar"
+        icon="pi pi-pencil"
+        severity="contrast"
+        class="p-button-outlined"
+        style="flex: 3;"
+        (click)="abrirModalEditar(c)"
+      ></button>
+
+      <button 
+        pButton 
+        icon="pi pi-trash"
+        severity="danger"
+        class="p-button-outlined"
+        style="flex: 1;"
+        (click)="abrirModalEliminar(c)"
+      ></button>
+    </div>
+
+  </p-card>
+</div>
+
+<!-- Tabla con detalles de los clientes -->
+<div style="width: 90%; margin: auto; margin-top: 30px;">
+  <p-table [value]="clientesFiltrados" [paginator]="true" [rows]="10" [responsiveLayout]="'scroll'">
+    
+    <!-- Encabezado -->
+    <ng-template pTemplate="header">
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Apellidos</th>
+        <th>Teléfono</th>
+        <th>DNI</th>
+        <th>Correo</th>
+      </tr>
+    </ng-template>
+
+    <!-- Cuerpo -->
+    <ng-template pTemplate="body" let-c>
+      <tr>
+        <td>CLI-{{ c.id | number:'3.0' }}</td>
+        <td>{{ c.nombre }}</td>
+        <td>{{ c.apellidos }}</td>
+        <td>{{ c.telefono }}</td>
+        <td>{{ c.dni }}</td>
+        <td>{{ c.correo }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog [(visible)]="modalVisible" [modal]="true" [closable]="false" [draggable]="false" [header]="modalTitulo">
+
+  <div class="p-fluid" style="display: flex; flex-direction: column; gap: 15px;">
+
+    <p-floatLabel variant="in">
+      <input pInputText [(ngModel)]="clienteModal.nombre" required />
+      <label>Nombre</label>
+    </p-floatLabel>
+
+    <p-floatLabel variant="in">
+      <input pInputText [(ngModel)]="clienteModal.apellidos" required />
+      <label>Apellidos</label>
+    </p-floatLabel>
+
+    <p-floatLabel variant="in">
+      <input pInputText [(ngModel)]="clienteModal.telefono" type="number" required/>
+      <label>Teléfono</label>
+    </p-floatLabel>
+
+    <p-floatLabel variant="in">
+      <input pInputText [(ngModel)]="clienteModal.dni" type="number" required />
+      <label>DNI</label>
+    </p-floatLabel>
+
+    <p-floatLabel variant="in">
+      <input pInputText [(ngModel)]="clienteModal.correo" required />
+      <label>Correo</label>
+    </p-floatLabel>
+
+  </div>
+
+  <div class="button-confirmar-cancelar" style="gap: 10px; margin-top: 15px;">
+    <button pButton label="Guardar" icon="pi pi-check" (click)="guardar()"></button>
+    <button pButton label="Cancelar" icon="pi pi-times" class="p-button-secondary" (click)="cerrarModal()"></button>
+  </div>
+
+</p-dialog>
+
+<p-dialog [(visible)]="modalEliminarVisible" [modal]="true" [closable]="false" [draggable]="false" header="Eliminar Cliente">
+  <p>
+    ¿Estás seguro de que deseas eliminar al cliente 
+    <strong>{{ clienteSeleccionado?.nombre }} {{ clienteSeleccionado?.apellidos }}</strong>?
+  </p>
+
+  <div class="button-confirmar-cancelar" style="gap: 10px; margin-top: 15px;">
+    <button pButton label="Eliminar" icon="pi pi-check" severity="danger" (click)="eliminar()"></button>
+    <button pButton label="Cancelar" icon="pi pi-times" class="p-button-secondary" (click)="cerrarModalEliminar()"></button>
+  </div>
+</p-dialog>
+

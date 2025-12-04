@@ -1,6 +1,9 @@
 <?php
 require_once 'conexion.php';
 
+require_once __DIR__ . '/../validations/tipopago.validations.php';
+
+
 class TipoPago {
     private $pdo;
 
@@ -63,3 +66,5 @@ class TipoPago {
         }
     }
 }
+
+?>

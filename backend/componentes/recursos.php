@@ -1,6 +1,6 @@
 <?php
 require_once 'conexion.php';
-require_once __DIR__ . '/../validations/RecursoValidation.php';
+require_once __DIR__ . '/../validations/recurso.validations.php';
 
 
 class Recursos {
@@ -100,3 +100,5 @@ class Recursos {
         }
     }
 }
+
+?>

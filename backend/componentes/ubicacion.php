@@ -1,6 +1,6 @@
 <?php
 require_once 'conexion.php';
-require_once 'validadores/UbicacionValidator.php';
+require_once __DIR__ . '/../validations/ubicacion.validations.php';
 
 class Ubicacion {
     private $pdo;
@@ -88,3 +88,5 @@ class Ubicacion {
         }
     }
 }
+
+?>

@@ -11,7 +11,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-require_once 'componentes/ubicacion.php';
+require_once '../componentes/ubicacion.php';
+require_once '../validations/ubicacion.validations.php';
 
 $ubicacion = new Ubicacion();
 $accion = $_GET['accion'] ?? '';
@@ -45,3 +46,5 @@ switch($accion) {
     default:
         echo json_encode(['error' => 'Acción no válida']);
 }
+
+?>

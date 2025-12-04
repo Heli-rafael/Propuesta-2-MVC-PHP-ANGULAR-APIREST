@@ -38,3 +38,5 @@ function validarUsuarioReservasDatos($data) {
     
     return $errores;
 }
+
+?>

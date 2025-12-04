@@ -1,0 +1,53 @@
+.section-message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 7px;
+  font-size: 17px;
+  font-weight: 500;
+  border: 1px solid transparent;
+}
+
+/* Estilo similar a p-message info */
+.section-message.info {
+  color: #2D6AEC;
+  background-color: #F0F7FF;
+  border-color: #BFDBFE;
+}
+
+/* Para otros tipos de mensaje */
+.section-message.success {
+  color: #16A34A;
+  background-color: #F1FDF5;
+  border-color: #BBF7D0;
+}
+
+.estado-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+
+.estado-buttons button {
+  flex: 1; /* todos igual ancho */
+  padding: 0.6rem 1rem;
+  border: 1px solid #dcdcdc;
+  background-color: transparent;
+  color: #333;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.estado-buttons button:hover {
+  background-color: #e0e0e0;
+}
+
+.estado-buttons button.active {
+  background-color: #007ad9;
+  color: white;
+  border-color: #007ad9;
+  box-shadow: 0 2px 6px rgba(0, 122, 217, 0.3);
+}

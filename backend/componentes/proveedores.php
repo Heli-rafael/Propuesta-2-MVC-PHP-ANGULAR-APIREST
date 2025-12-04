@@ -1,6 +1,6 @@
 <?php
 require_once 'conexion.php';
-require_once __DIR__ . '/../validations/proveedorValidation.php';
+require_once __DIR__ . '/../validations/proveedor.validations.php';
 
 
 class Proveedores {
@@ -103,3 +103,5 @@ class Proveedores {
         }
     }
 }
+
+?>

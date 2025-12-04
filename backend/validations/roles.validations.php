@@ -12,3 +12,5 @@ function validarRoles($data) {
 
     return ['success' => true];
 }
+
+?>

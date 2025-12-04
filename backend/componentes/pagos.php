@@ -13,7 +13,9 @@ class Pagos {
     public function listar() {
         try {
             $stmt = $this->pdo->query("
-                SELECT p.*, tp.nombre AS tipo_pago, a.valor AS adelanto
+                SELECT p.id, p.id_tipo_pago, p.id_adelanto,
+                       tp.nombre AS tipo_pago,
+                       a.valor AS adelanto
                 FROM Pagos p
                 LEFT JOIN Tipo_Pago tp ON p.id_tipo_pago = tp.id
                 LEFT JOIN Adelanto a ON p.id_adelanto = a.id
@@ -35,7 +37,7 @@ class Pagos {
         }
 
         try {
-            $stmt = $this->pdo->prepare("SELECT * FROM Pagos WHERE id = :id");
+            $stmt = $this->pdo->prepare("SELECT id, id_tipo_pago, id_adelanto FROM Pagos WHERE id = :id");
             $stmt->execute([':id' => $id]);
             $pago = $stmt->fetch(PDO::FETCH_ASSOC);
             echo json_encode($pago);
@@ -55,14 +57,10 @@ class Pagos {
 
         try {
             $stmt = $this->pdo->prepare("
-                INSERT INTO Pagos (numero_tarjeta, fecha_vencimiento, cvv, voucer, id_tipo_pago, id_adelanto)
-                VALUES (:numero_tarjeta, :fecha_vencimiento, :cvv, :voucer, :id_tipo_pago, :id_adelanto)
+                INSERT INTO Pagos (id_tipo_pago, id_adelanto)
+                VALUES (:id_tipo_pago, :id_adelanto)
             ");
             $stmt->execute([
-                ':numero_tarjeta' => $data['numero_tarjeta'] ?? null,
-                ':fecha_vencimiento' => $data['fecha_vencimiento'] ?? null,
-                ':cvv' => $data['cvv'] ?? null,
-                ':voucer' => $data['voucer'] ?? null,
                 ':id_tipo_pago' => $data['id_tipo_pago'],
                 ':id_adelanto' => $data['id_adelanto']
             ]);
@@ -88,20 +86,12 @@ class Pagos {
         try {
             $stmt = $this->pdo->prepare("
                 UPDATE Pagos SET
-                    numero_tarjeta = :numero_tarjeta,
-                    fecha_vencimiento = :fecha_vencimiento,
-                    cvv = :cvv,
-                    voucer = :voucer,
                     id_tipo_pago = :id_tipo_pago,
                     id_adelanto = :id_adelanto
                 WHERE id = :id
             ");
             $stmt->execute([
                 ':id' => $id,
-                ':numero_tarjeta' => $data['numero_tarjeta'] ?? null,
-                ':fecha_vencimiento' => $data['fecha_vencimiento'] ?? null,
-                ':cvv' => $data['cvv'] ?? null,
-                ':voucer' => $data['voucer'] ?? null,
                 ':id_tipo_pago' => $data['id_tipo_pago'],
                 ':id_adelanto' => $data['id_adelanto']
             ]);
@@ -130,4 +120,5 @@ class Pagos {
         }
     }
 }
+
 ?>

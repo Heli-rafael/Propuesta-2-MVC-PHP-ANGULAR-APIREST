@@ -44,3 +44,5 @@ function validarUsuarioDatos($data) {
     
     return $errores;
 }
+
+?>

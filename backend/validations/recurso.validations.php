@@ -54,3 +54,5 @@ class RecursoValidation {
            return $d && $d->format('Y-m-d') === $fecha;
     }
 }
+
+?>

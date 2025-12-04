@@ -12,4 +12,5 @@ class ServicioValidation {
         return $errores;
     }
 }
+
 ?>

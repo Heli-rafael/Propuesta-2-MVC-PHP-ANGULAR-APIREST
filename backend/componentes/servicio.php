@@ -1,7 +1,7 @@
 <?php
 require_once 'conexion.php';
 
-require_once __DIR__ . '/../validations/ServicioValidation.php';
+require_once __DIR__ . '/../validations/servicio.validations.php';
 
 class Servicios {
     private $pdo;
@@ -91,3 +91,5 @@ class Servicios {
         }
     }
 }
+
+?>

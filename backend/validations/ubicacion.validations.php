@@ -7,6 +7,7 @@
 
         public function __construct(array $data){$this->data = $data;}
 
+        
         public function validarUbicacionId($id){
             $this->errores = [];
 
@@ -18,17 +19,20 @@
             return $errores;
         }
 
-        function validateDatos($data){
+        public function validateDatos($data){
             $this->errores = [];
             $nombre = $this->data['nombre'] ?? '';
 
             if (empty(trim($nombre))){
                 $this->errores['nombre'] = 'El nombre de la ubicación es obligatoria.';
             } elseif (strlen($nombre) < 3){
-                $this->errores['nombre'] = 'El nombre de la ubicacion debe tener mas de 3 caracteres.';
+                $this->errores['nombre'] = 'El nombre de la ubicación debe tener más de 3 caracteres.';
             } elseif (strlen($nombre) > 100){
-                $this->errores['nombre'] = 'El nombre de la ubicacion no debe exceder los 100 caracteres.';
+                $this->errores['nombre'] = 'El nombre de la ubicación no debe exceder los 100 caracteres.';
             }
+
+            // Retorna true si no hay errores, false si los hay
+            return empty($this->errores);
         }
 
         public function getErrors()

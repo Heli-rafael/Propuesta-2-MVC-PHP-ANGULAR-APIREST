@@ -103,11 +103,11 @@ export class App {
   
   menuItems = [
     { label: 'Panel General', icon: 'pi pi-th-large', route: '/' },
-    { label: 'Reservas', icon: 'pi pi-calendar', route: '/' },
+    { label: 'Reservas', icon: 'pi pi-calendar', route: '/reservas' },
     { label: 'Recursos', icon: 'pi pi-box', route: '/recursos' },
     { label: 'Proveedores', icon: 'pi pi-building', route: '/proveedores' },
-    { label: 'Clientes', icon: 'pi pi-user', route: '/' },
-    { label: 'Pagos', icon: 'pi pi-credit-card', route: '/' },
+    { label: 'Clientes', icon: 'pi pi-user', route: '/clientes' },
+    { label: 'Pagos', icon: 'pi pi-credit-card', route: '/pagos' },
     { label: 'Notificaciones', icon: 'pi pi-bell', route: '/' },
     { label: 'Configuración', icon: 'pi pi-cog', route: '/' },
   ];

@@ -1,0 +1,229 @@
+<div style="width:90%; margin:auto; margin-top:20px; display:flex; gap:20px;">
+  <!-- Total pagos -->
+  <div style="flex:1; background:#F8FAFC; padding:20px; border-radius:12px; box-shadow:0 3px 6px rgba(0,0,0,0.1); display:flex; justify-content:space-between; align-items:center;">
+    <div>
+      <i class="pi pi-credit-card" style="font-size:2.5rem"></i>
+      <div style="font-weight:bold; margin-top:8px;">Total Pagos</div>
+    </div>
+    <div style="font-size:32px; font-weight:bold;">{{ pagos.length }}</div>
+  </div>
+</div>
+
+<div style="width:90%; margin:auto; margin-top:20px; display:flex; gap:10px; align-items:center;">
+  <input pInputText [(ngModel)]="busqueda" placeholder="Buscar pago..." (input)="filtrar()" style="flex:1; padding:8px; border-radius:4px;"/>
+  
+  <p-select [options]="tipos" optionLabel="nombre" optionValue="id" [(ngModel)]="filtroTipoPago"
+            placeholder="Filtrar por tipo" [showClear]="true" (onChange)="filtrar()" appendTo="body">
+  </p-select>
+
+  <button pButton label="Agregar Pago" icon="pi pi-plus" (click)="abrirModalAgregar()"></button>
+</div>
+
+<div style="width:90%; margin:auto; display:flex; flex-wrap:wrap; gap:20px; margin-top:20px;">
+  <p-card *ngFor="let pago of pagosFiltrados" [style]="{'width' : '350px'}">
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 15px;">
+      <i class="pi pi-credit-card" style="font-size: 2.5rem"></i>
+      <div style="flex: 1; font-weight: bold;">
+        {{ pago.tipo_pago }}<br>
+        (PAGO-{{ pago.id | number:'3.0' }})
+      </div>
+      <div style="font-weight: bold;">{{ pago.adelanto ? ('Adelanto: %' + pago.adelanto) : '-' }}</div>
+    </div>
+
+    <div style="display:flex; gap:5px; margin-top:10px;">
+      <button pButton icon="pi pi-pencil" label="Editar" (click)="abrirModalEditar(pago)" style="flex:3;" class="p-button-outlined"></button>
+      <button pButton icon="pi pi-trash" (click)="abrirModalEliminar(pago)" style="flex:1;" class="p-button-danger p-button-outlined"></button>
+    </div>
+  </p-card>
+</div>
+
+<!-- Modal Agregar / Editar Pago -->
+<p-dialog [(visible)]="modalVisible" [modal]="true" [closable]="false" header="{{ modalTitulo }}">
+  <div class="p-fluid" style="display:flex; flex-direction:column; gap:15px;">
+
+    <!-- Tipo de Pago -->
+    <p-floatLabel variant="in">
+      <p-select 
+        [options]="tipos" 
+        optionLabel="nombre" 
+        optionValue="nombre" 
+        [(ngModel)]="pagoModal.tipo_pago" 
+        style="width: 100%;" 
+        appendTo="body">
+        <ng-template #footer>
+          <div class="p-3">
+            <p-button 
+              label="Agregar Nueva" 
+              severity="secondary" 
+              variant="text"
+              icon="pi pi-plus"
+              (click)="abrirModalTipoPago()"
+              [style]="{ width: '100%' }"
+            />
+          </div>
+        </ng-template>
+      </p-select>
+      <label>Tipo de pago</label>
+    </p-floatLabel>
+    </div>
+
+    <!-- Efectivo -->
+    <div *ngIf="pagoModal.tipo_pago == 'Efectivo' && pagoModal.tipo_pago">
+        <h3>
+            Pago en efectivo
+        </h3>
+    </div>
+
+    <!-- Adelanto -->
+    <p-floatLabel variant="in">
+      <p-select [options]="adelantos" optionLabel="valor" optionValue="id" [(ngModel)]="pagoModal.id_adelanto" style="width: 100%;" appendTo="body">
+        <ng-template #footer>
+          <div class="p-3">
+            <p-button 
+              label="Agregar Nueva" 
+              severity="secondary" 
+              variant="text"
+              icon="pi pi-plus"
+              (click)="abrirModalAdelanto()"
+              [style]="{ width: '100%' }"
+            />
+          </div>
+        </ng-template>
+      </p-select>
+      <label>Adelanto</label>
+    </p-floatLabel>
+
+
+  <div class="button-confirmar-cancelar" style="gap:10px; margin-top:10px;">
+    <button pButton label="Guardar" icon="pi pi-check" (click)="guardarPago()"></button>
+    <button pButton label="Cancelar" icon="pi pi-times" class="p-button-secondary" (click)="cerrarModal()"></button>
+  </div>
+</p-dialog>
+
+<!-- Modal Eliminar Pago -->
+<p-dialog [(visible)]="modalEliminarVisible" [modal]="true" [closable]="false" header="Eliminar Pago">
+  <p>¿Deseas eliminar el pago <strong>{{ pagoModal.tipo_pago }}</strong>?</p>
+  <div class="button-confirmar-cancelar" style="gap:10px; margin-top:10px;">
+    <button pButton label="Eliminar" icon="pi pi-check" (click)="eliminarPago()"></button>
+    <button pButton label="Cancelar" icon="pi pi-times" class="p-button-secondary" (click)="cerrarModalEliminar()"></button>
+  </div>
+</p-dialog>
+
+<!-- Tipo Pago-->
+<!-- Modal Principal de Tipo Pago -->
+<p-dialog 
+    [(visible)]="modalTipoPago" 
+    [modal]="true" 
+    [style]="{ width: '70vw', height: '80vh' }"
+    [draggable]="false" 
+    header="Gestión de Tipo de pagos"
+    appendTo="body"
+>
+    <div style="width:90%; margin:auto; margin-top:20px;">
+    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+        <input pInputText [(ngModel)]="busquedaTipoPago" placeholder="Buscar tipo de pago..." (input)="filtrarTipos()" style="flex:1; margin-right:10px;"/>
+        <button pButton label="Agregar Tipo de pago" icon="pi pi-plus" (click)="abrirModalAgregarTipoPago()"></button>
+    </div>
+
+    <p-table [value]="tiposFiltrados">
+        <ng-template pTemplate="header">
+        <tr>
+            <th>Nombre</th>
+            <th>Acciones</th>
+        </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-tipo>
+        <tr>
+            <td>{{ tipo.nombre }}</td>
+            <td>
+            <button pButton icon="pi pi-pencil" class="p-button-text" (click)="abrirModalEditarTipoPago(tipo)"></button>
+            <button pButton icon="pi pi-trash" class="p-button-text" (click)="abrirModalEliminarTipoPago(tipo)"></button>
+            </td>
+        </tr>
+        </ng-template>
+    </p-table>
+    </div>
+
+    <!-- Modal Agregar / Editar Tipo -->
+    <p-dialog [(visible)]="modalVisibleTipoPago" [modal]="true" [closable]="false" header="{{ modalTitulo }}" appendTo="body">
+    <div class="p-fluid" style="display:flex; flex-direction:column; gap:15px;">
+        <p-floatLabel variant="in">
+        <input pInputText [(ngModel)]="tipoModal.nombre" required />
+        <label>Nombre</label>
+        </p-floatLabel>
+    </div>
+    <div class="button-confirmar-cancelar" style="gap:10px; margin-top:10px;">
+        <button pButton label="Guardar" icon="pi pi-check" (click)="guardarTipoPago()"></button>
+        <button pButton label="Cancelar" icon="pi pi-times" class="p-button-secondary" (click)="cerrarModalTipoPago()"></button>
+    </div>
+    </p-dialog>
+
+    <!-- Modal Eliminar Tipo -->
+    <p-dialog [(visible)]="modalEliminarVisibleTipoPago" [modal]="true" [closable]="false" header="Eliminar Tipo de Pago" appendTo="body">
+    <p>¿Deseas eliminar el tipo de pago <strong>{{ tipoSeleccionado.nombre }}</strong>?</p>
+    <div class="button-confirmar-cancelar" style="gap:10px; margin-top:10px;">
+        <button pButton label="Eliminar" icon="pi pi-check" (click)="eliminarTipoPago()"></button>
+        <button pButton label="Cancelar" icon="pi pi-times" class="p-button-secondary" (click)="cerrarModalEliminarTipoPago()"></button>
+    </div>
+    </p-dialog>
+</p-dialog>
+
+<!-- Adelanto-->
+<!-- Modal Principal de Adelanto -->
+<p-dialog 
+    [(visible)]="modalAdelanto" 
+    [modal]="true" 
+    [style]="{ width: '70vw', height: '80vh' }"
+    [draggable]="false" 
+    header="Gestión de Adelantos"
+    appendTo="body"
+>
+
+    <div style="width:90%; margin:auto; margin-top:20px;">
+    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+        <input pInputText [(ngModel)]="busquedaAdelanto" placeholder="Buscar adelanto..." (input)="filtrarAdelantos()" style="flex:1; margin-right:10px;"/>
+        <button pButton label="Agregar Adelanto" icon="pi pi-plus" (click)="abrirModalAgregarAdelanto()"></button>
+    </div>
+
+    <p-table [value]="adelantosFiltrados">
+        <ng-template pTemplate="header">
+        <tr>
+            <th>Valor (%)</th>
+            <th>Acciones</th>
+        </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-adelanto>
+        <tr>
+            <td>{{ adelanto.valor }}</td>
+            <td>
+            <button pButton icon="pi pi-pencil" class="p-button-text" (click)="abrirModalEditarAdelanto(adelanto)"></button>
+            <button pButton icon="pi pi-trash" class="p-button-text" (click)="abrirModalEliminarAdelanto(adelanto)"></button>
+            </td>
+        </tr>
+        </ng-template>
+    </p-table>
+    </div>
+
+    <!-- Modal Agregar / Editar Adelanto -->
+    <p-dialog [(visible)]="modalVisibleAdelanto" [modal]="true" [closable]="false" header="{{ modalTituloAdelanto }}" appendTo="body">
+    <div class="p-fluid" style="display:flex; flex-direction:column; gap:15px;">
+        <p-floatLabel variant="in">
+        <input pInputText type="number" [(ngModel)]="adelantoModal.valor" required />
+        <label>Valor</label>
+        </p-floatLabel>
+    </div>
+    <div class="button-confirmar-cancelar" style="gap:10px; margin-top:10px;">
+        <button pButton label="Guardar" icon="pi pi-check" (click)="guardarAdelanto()"></button>
+        <button pButton label="Cancelar" icon="pi pi-times" class="p-button-secondary" (click)="cerrarModalAdelanto()"></button>
+    </div>
+    </p-dialog>
+
+    <!-- Modal Eliminar Adelanto -->
+    <p-dialog [(visible)]="modalEliminarVisibleAdelanto" [modal]="true" [closable]="false" header="Eliminar Adelanto" appendTo="body">
+    <p>¿Deseas eliminar el adelanto <strong>{{ adelantoSeleccionado.valor }}</strong>?</p>
+    <div class="button-confirmar-cancelar" style="gap:10px; margin-top:10px;">
+        <button pButton label="Eliminar" icon="pi pi-check" (click)="eliminarAdelanto()"></button>
+        <button pButton label="Cancelar" icon="pi pi-times" class="p-button-secondary" (click)="cerrarModalEliminarAdelanto()"></button>
+    </div>
+    </p-dialog>
+</p-dialog>

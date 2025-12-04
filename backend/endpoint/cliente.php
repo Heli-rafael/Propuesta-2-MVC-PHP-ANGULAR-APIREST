@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-require_once 'componentes/cliente.php';
+require_once '../componentes/cliente.php';
 
 $cliente = new Cliente();
 $accion = $_GET['accion'] ?? '';
@@ -45,3 +45,5 @@ switch($accion) {
     default:
         echo json_encode(['error' => 'Acción no válida']);
 }
+
+?>

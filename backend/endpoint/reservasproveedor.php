@@ -11,33 +11,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-require_once 'componentes/reservasproveedor.php';
+require_once '../componentes/reservasproveedor.php';
+require_once '../validations/reservaproveedor.validations.php';
+
 
 $reservasProveedor = new ReservasProveedor();
 $accion = $_GET['accion'] ?? '';
 
 switch($accion) {
-    case 'listar':
-        $reservasProveedor->listar();
-        break;
-
-    case 'obtener':
+        
+    case 'obtenerPorReserva':
         $id_reservas = $_GET['id_reservas'] ?? 0;
-        $id_proveedores = $_GET['id_proveedores'] ?? 0;
-        $reservasProveedor->obtener($id_reservas, $id_proveedores);
+        $reservasProveedor->obtenerPorReserva($id_reservas);
         break;
-
-    case 'crear':
-        $data = json_decode(file_get_contents('php://input'), true);
-        $reservasProveedor->crear($data);
-        break;
-
-    case 'eliminar':
-        $id_reservas = $_GET['id_reservas'] ?? 0;
-        $id_proveedores = $_GET['id_proveedores'] ?? 0;
-        $reservasProveedor->eliminar($id_reservas, $id_proveedores);
-        break;
-
+        
     default:
         echo json_encode(['error' => 'Acción no válida']);
 }
+
+?>

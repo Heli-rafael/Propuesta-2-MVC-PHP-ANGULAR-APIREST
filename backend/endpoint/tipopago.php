@@ -11,8 +11,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-require_once 'componentes/tipopago.php';
-require_once '../validations/tipopago.php';
+require_once '../componentes/tipopago.php';
+require_once '../validations/tipopago.validations.php';
 
 $tipoPago = new TipoPago();
 $accion = $_GET['accion'] ?? '';
@@ -51,3 +51,5 @@ switch ($accion) {
     default:
         echo json_encode(['error' => 'Acción no válida']);
 }
+
+?>

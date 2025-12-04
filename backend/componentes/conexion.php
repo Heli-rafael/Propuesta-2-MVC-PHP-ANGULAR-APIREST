@@ -38,3 +38,5 @@ class Conexion {
         $this->conexion = null;
     }
 }
+
+?>

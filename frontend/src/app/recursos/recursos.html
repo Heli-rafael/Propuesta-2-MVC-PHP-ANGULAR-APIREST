@@ -344,7 +344,7 @@
     
 
     <!-- Modal Agregar/Editar -->
-    <p-dialog [(visible)]="modalVisibleTipo" [modal]="true" [closable]="false" header="{{ modalTituloTipo }}">
+    <p-dialog [(visible)]="modalVisibleTipo" [modal]="true" [closable]="false" header="{{ modalTituloTipo }}" appendTo="body">
     <div class="p-fluid" style="display:flex; flex-direction:column; gap:15px;">
         <p-floatLabel variant="in">
             <input pInputText [(ngModel)]="tipoModal.nombre" required />

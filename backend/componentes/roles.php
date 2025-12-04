@@ -1,5 +1,7 @@
 <?php
 require_once 'conexion.php';
+require_once __DIR__ . '/../validations/roles.validations.php';
+
 
 class Roles {
     private $pdo;
@@ -63,3 +65,5 @@ class Roles {
         }
     }
 }
+
+?>

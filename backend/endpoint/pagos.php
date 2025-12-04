@@ -11,7 +11,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-require_once 'componentes/pagos.php';
+require_once '../componentes/pagos.php';
+require_once '../validations/pagos.validations.php';
 
 $pagos = new Pagos();
 $accion = $_GET['accion'] ?? '';
@@ -45,3 +46,5 @@ switch($accion) {
     default:
         echo json_encode(['error' => 'Acción no válida']);
 }
+
+?>

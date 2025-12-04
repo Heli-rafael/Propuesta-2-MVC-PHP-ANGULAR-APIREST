@@ -1,6 +1,8 @@
 <?php
 require_once 'conexion.php';
 
+require_once __DIR__ . '/../validations/tiporecurso.validations.php';
+
 class TipoRecurso {
     private $pdo;
 
@@ -63,3 +65,5 @@ class TipoRecurso {
         }
     }
 }
+
+?>

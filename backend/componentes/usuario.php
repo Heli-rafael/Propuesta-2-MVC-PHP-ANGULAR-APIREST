@@ -1,5 +1,6 @@
 <?php
 require_once 'conexion.php';
+require_once __DIR__ . '/../validations/usuario.validations.php';
 
 class Usuario {
     private $pdo;
@@ -71,3 +72,5 @@ class Usuario {
         }
     }
 }
+
+?>

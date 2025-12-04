@@ -22,9 +22,6 @@ function validarPagoDatos($data) {
     } else if (!is_numeric($data['id_adelanto'])) {
         $errores[] = 'El "id_adelanto" debe ser un ID válido.';
     }
-    if (empty($data['voucer'])) {
-        $errores[] = 'El "voucer" es obligatorio.';
-    }
     return $errores;
 }
 ?>

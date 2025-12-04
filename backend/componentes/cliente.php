@@ -50,14 +50,15 @@ class Cliente {
 
         try {
             $stmt = $this->pdo->prepare("
-                INSERT INTO Cliente (nombre, apellidos, telefono, dni) 
-                VALUES (:nombre, :apellidos, :telefono, :dni)
+                INSERT INTO Cliente (nombre, apellidos, telefono, dni, correo) 
+                VALUES (:nombre, :apellidos, :telefono, :dni, :correo)
             ");
             $stmt->execute([
                 ':nombre' => $data['nombre'],
                 ':apellidos' => $data['apellidos'],
                 ':telefono' => $data['telefono'],
-                ':dni' => $data['dni']
+                ':dni' => $data['dni'],
+                ':correo' => $data['correo']
             ]);
             http_response_code(201);
             echo json_encode(['success' => true, 'id' => $this->pdo->lastInsertId()]);
@@ -81,7 +82,7 @@ class Cliente {
         try {
             $stmt = $this->pdo->prepare("
                 UPDATE Cliente 
-                SET nombre = :nombre, apellidos = :apellidos, telefono = :telefono, dni = :dni 
+                SET nombre = :nombre, apellidos = :apellidos, telefono = :telefono, dni = :dni, correo = :correo
                 WHERE id = :id
             ");
             $stmt->execute([
@@ -89,7 +90,8 @@ class Cliente {
                 ':nombre' => $data['nombre'],
                 ':apellidos' => $data['apellidos'],
                 ':telefono' => $data['telefono'],
-                ':dni' => $data['dni']
+                ':dni' => $data['dni'],
+                ':correo' => $data['correo']
             ]);
             echo json_encode(['success' => true]);
         } catch (PDOException $e) {
@@ -116,4 +118,5 @@ class Cliente {
         }
     }
 }
+
 ?>

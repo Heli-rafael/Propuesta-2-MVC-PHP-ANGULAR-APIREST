@@ -28,13 +28,22 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { MessageModule } from 'primeng/message';
 import { DatePickerModule } from 'primeng/datepicker';
 import { Proveedores } from './proveedores/proveedores';
+import { Reservas } from './reservas/reservas';
+import { Clientes } from './clientes/clientes';
+import { Pagos } from './pagos/pagos';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { ChipModule } from 'primeng/chip';
 
 @NgModule({
   declarations: [
     App,
     Roles,
     Recursos,
-    Proveedores
+    Proveedores,
+    Reservas,
+    Clientes,
+    Pagos
   ],
   imports: [
     BrowserModule,
@@ -54,7 +63,10 @@ import { Proveedores } from './proveedores/proveedores';
     InputTextModule,
     FloatLabelModule,
     MessageModule,
-    DatePickerModule
+    DatePickerModule,
+    ReactiveFormsModule,
+    MultiSelectModule,
+    ChipModule
   ],
   providers: [
     provideBrowserGlobalErrorListeners(),

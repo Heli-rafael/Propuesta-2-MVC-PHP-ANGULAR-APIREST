@@ -8,6 +8,7 @@ import { ApiConfig } from './api.config';
   providedIn: 'root'
 })
 export class TipoRecursoService {
+    
     private apiUrl = `${ApiConfig.apiUrl}tiporecurso.php`;
 
     constructor(private http: HttpClient) {}

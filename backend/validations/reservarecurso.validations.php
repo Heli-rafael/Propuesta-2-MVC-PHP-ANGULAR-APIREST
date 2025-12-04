@@ -16,3 +16,5 @@ function validarReservasRecursos($data) {
 
     return ['success' => true];
 }
+
+?>

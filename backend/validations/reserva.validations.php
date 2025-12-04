@@ -27,7 +27,7 @@ class ReservasValidation {
         }
 
       
-        $estados_validos = ['Cancelada', 'Con Adelanto', 'Por Pagar'];
+        $estados_validos = ['Cancelada', 'Con Adelanto', 'Por Pagar', 'Pagada'];
         if (!empty($data['estado']) && !in_array($data['estado'], $estados_validos)) {
             $errores['estado'] = 'El estado no es válido.';
         }
@@ -61,3 +61,5 @@ class ReservasValidation {
         return $d && $d->format('Y-m-d') === $fecha;
     }
 }
+
+?>

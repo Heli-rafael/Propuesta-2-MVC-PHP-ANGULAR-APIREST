@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 require_once '../componentes/tiporecurso.php';
-require_once '../validations/tiporecurso.php';
+require_once '../validations/tiporecurso.validations.php';
 
 $tipoRecurso = new TipoRecurso();
 $accion = $_GET['accion'] ?? '';
@@ -51,3 +51,5 @@ switch ($accion) {
     default:
         echo json_encode(['error' => 'Acción no válida']);
 }
+
+?>

@@ -1,0 +1,955 @@
+<div
+  style="
+    width: 90%;
+    margin: auto;
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+    margin-top: 20px;
+  "
+>
+  <!-- TOTAL -->
+  <div
+    style="
+      flex: 1;
+      background: #f8fafc;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    "
+  >
+    <div>
+      <i class="pi pi-calendar" style="font-size: 2.5rem; color: #334155"></i>
+      <div style="font-weight: bold; font-size: 16px; margin-top: 8px">
+        Total Reservas
+      </div>
+    </div>
+
+    <div style="font-size: 32px; font-weight: bold; color: #334155">
+      {{ totalReservas }}
+    </div>
+  </div>
+  
+  <!-- Pagada -->
+  <div
+    style="
+      flex: 1;
+      background: #DCFCE7;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    "
+  >
+    <div>
+      <i class="pi pi-check-circle" style="font-size: 2.5rem; color: #22C55E"></i>
+      <div style="font-weight: bold; font-size: 16px; margin-top: 8px; color: #22C55E">
+        Pagadas
+      </div>
+    </div>
+
+    <div style="font-size: 32px; font-weight: bold; color: #22C55E">
+      {{ totalPagadas }}
+    </div>
+  </div>
+
+  <!-- CON ADELANTO -->
+  <div
+    style="
+      flex: 1;
+      background: #DBEAFE;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    "
+  >
+    <div>
+      <i class="pi pi-money-bill" style="font-size: 2.5rem; color: #2563eb"></i>
+      <div style="font-weight: bold; font-size: 16px; margin-top: 8px; color: #2563eb">
+        Con Adelanto
+      </div>
+    </div>
+
+    <div style="font-size: 32px; font-weight: bold; color: #2563eb">
+      {{ totalConAdelanto }}
+    </div>
+  </div>
+
+  <!-- POR PAGAR -->
+  <div
+    style="
+      flex: 1;
+      background: #FEF3C7;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    "
+  >
+    <div>
+      <i class="pi pi-exclamation-circle" style="font-size: 2.5rem; color: #CA8A04"></i>
+      <div style="font-weight: bold; font-size: 16px; margin-top: 8px; color: #CA8A04">
+        Por Pagar
+      </div>
+    </div>
+
+    <div style="font-size: 32px; font-weight: bold; color: #CA8A04">
+      {{ totalPorPagar }}
+    </div>
+  </div>
+
+  <!-- CANCELADAS -->
+  <div
+    style="
+      flex: 1;
+      background: #fee2e2;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    "
+  >
+    <div>
+      <i class="pi pi-times-circle" style="font-size: 2.5rem; color: #dc2626"></i>
+      <div style="font-weight: bold; font-size: 16px; margin-top: 8px; color: #dc2626">
+        Canceladas
+      </div>
+    </div>
+
+    <div style="font-size: 32px; font-weight: bold; color: #dc2626">
+      {{ totalCanceladas }}
+    </div>
+  </div>
+</div>
+
+<!-- ===== BUSCADOR Y FILTROS ===== -->
+<div style="width: 90%; margin: auto; padding: 3% 0">
+  <div style="display: flex; align-items: center; justify-content: space-between; gap: 20px">
+    <!-- BÚSQUEDA -->
+    <div style="flex: 1">
+      <input
+        pInputText
+        [(ngModel)]="busqueda"
+        placeholder="Buscar por fecha o ID..."
+        (input)="filtrar()"
+        style="width: 100%; padding: 8px; border-radius: 4px"
+      />
+    </div>
+
+    <!-- ESTADO -->
+    <p-select
+      [options]="estados"
+      [(ngModel)]="filtroEstado"
+      [showClear]="true"
+      placeholder="Filtrar por estado"
+      (onChange)="filtrar()"
+      appendTo="body"
+    ></p-select>
+
+    <!-- BOTÓN AGREGAR -->
+    <button
+      pButton
+      label="Nueva Reserva"
+      icon="pi pi-plus"
+      (click)="abrirModalAgregar()"
+    ></button>
+  </div>
+</div>
+
+<!-- ===== LISTADO ===== -->
+<div style="width: 90%; margin: auto; display: flex; flex-wrap: wrap; gap: 20px">
+  <p-card
+    *ngFor="let r of reservasFiltradas"
+    styleClass="reserva-card"
+    [style]="{ width: '350px' }"
+  >
+    <!-- ENCABEZADO -->
+    <div
+      style="
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+      "
+    >
+      <i class="pi pi-calendar" style="font-size: 2.5rem"></i>
+
+      <div style="flex: 1; font-weight: bold">
+        Reserva #{{ r.id }}
+        <br />
+        <small>{{ r.fecha | date : "dd/MM/yyyy" }}</small>
+      </div>
+
+      <!-- Estado -->
+      <p-message
+        [severity]="
+            r.estado === 'Pagada'
+            ? 'success'
+            : r.estado === 'Por Pagar'
+            ? 'warn'
+            : r.estado === 'Con Adelanto'
+            ? 'info'
+            : r.estado === 'Cancelada'
+            ? 'error'
+            : 'secondary'
+        "
+        [text]="r.estado"
+        [icon]="
+            r.estado === 'Pagada' ? 'pi pi-check-circle' :
+            r.estado === 'Por Pagar' ? 'pi pi-exclamation-circle' :
+            r.estado === 'Con Adelanto' ? 'pi pi-money-bill' :
+            r.estado === 'Cancelada' ? 'pi pi-times-circle' : 'pi pi-info-circle'
+        "
+        size="small"
+      ></p-message>
+    </div>
+
+    <!-- DETALLES -->
+    <div
+      style="
+        display: grid;
+        grid-template-columns: 130px auto;
+        row-gap: 10px;
+        font-size: 14px;
+        margin: 15px 0;
+      "
+    >
+      <div><strong>Asistentes:</strong></div>
+      <div style="text-align: right">{{ r.numero_asistentes }}</div>
+
+      <div><strong>Total (S/):</strong></div>
+      <div style="text-align: right">{{ r.total }}</div>
+
+      <div><strong>Cliente:</strong></div>
+      <div style="text-align: right">{{ getNombreCliente(r.id_cliente) }}</div>
+
+      <div><strong>Pago:</strong></div>
+      <div style="text-align: right">{{ getNombrePago(r.id_pagos) }}</div>
+
+      <div><strong>Evento:</strong></div>
+      <div style="text-align: right">{{ getNombreEvento(r.id_evento) }}</div>
+
+      <div><strong>Ubicación:</strong></div>
+      <div style="text-align: right">{{ getNombreUbicacion(r.id_ubicacion) }}</div>
+    </div>
+
+    <!-- ACCIONES -->
+    <div style="display: flex; gap: 5px">
+      <button
+        pButton
+        label="Editar"
+        icon="pi pi-pencil"
+        class="p-button-outlined"
+        (click)="abrirModalEditar(r)"
+        style="flex: 3"
+      ></button>
+
+      <button
+        pButton
+        icon="pi pi-trash"
+        severity="danger"
+        class="p-button-danger p-button-outlined"
+        (click)="abrirModalEliminar(r)"
+        style="flex: 1"
+      ></button>
+    </div>
+  </p-card>
+</div>
+
+<div style="width: 90%; margin: auto; margin-top: 20px">
+  <p-table 
+    [value]="reservasFiltradas" 
+    [paginator]="true" 
+    [rows]="10" 
+    [responsiveLayout]="'scroll'"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} reservas"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th>ID</th>
+        <th>Cliente</th>
+        <th>Evento</th>
+        <th>Fecha</th>
+        <th>Total (S/)</th>
+        <th>Adelanto (S/)</th>
+        <th>Saldo (S/)</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-r>
+      <tr>
+        <td>EVT-{{ r.id }}</td>
+        <td>{{ getNombreCliente(r.id_cliente) }}</td>
+        <td>{{ getNombreEvento(r.id_evento) }}</td>
+        <td>{{ r.fecha | date: 'yyyy-MM-dd' }}</td>
+        <td>{{ r.total | currency:'S/ ':'symbol' }}</td>
+        <td>{{ getAdelantoEnSoles(r) | currency:'S/ ':'symbol' }}</td>
+        <td>{{ getSaldo(r) | currency:'S/':'symbol' }}</td>
+        <td>
+          <p-message
+            [severity]="
+              r.estado === 'Pagada' ? 'success' :
+              r.estado === 'Por Pagar' ? 'warn' :
+              r.estado === 'Con Adelanto' ? 'info' :
+              r.estado === 'Cancelada' ? 'error' : 'secondary'
+            "
+            [text]="r.estado"
+            [icon]="
+              r.estado === 'Pagada' ? 'pi pi-check-circle' :
+              r.estado === 'Por Pagar' ? 'pi pi-exclamation-circle' :
+              r.estado === 'Con Adelanto' ? 'pi pi-money-bill' :
+              r.estado === 'Cancelada' ? 'pi pi-times-circle' : 'pi pi-info-circle'
+            "
+            size="small"
+          ></p-message>
+        </td>
+        <td style="display: flex; gap: 10px;">
+          <button 
+            pButton 
+            icon="pi pi-pencil" 
+            class="p-button-rounded p-button-outlined " 
+            (click)="abrirModalEditar(r)"
+          ></button>
+          <button 
+            pButton 
+            icon="pi pi-trash" 
+            class="p-button-rounded p-button-outlined p-button-danger" 
+            (click)="abrirModalEliminar(r)"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<!-- ===== MODAL AGREGAR / EDITAR ===== -->
+<p-dialog
+  [(visible)]="modalVisible"
+  [modal]="true"
+  [closable]="false"
+  [draggable]="false"
+  [header]="modalTitulo"
+>
+  <div class="p-fluid" style="display: flex; flex-direction: column; gap: 15px">
+
+    <!-- ESTADO -->
+    <div class="estado-buttons" style="display: flex; gap: 10px;">
+      <button
+        *ngFor="let estado of estados"
+        type="button"
+        pButton
+        [label]="estado.label"
+        [class.active]="reservaModal.estado === estado.value"
+        (click)="reservaModal.estado = estado.value"
+      ></button>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 20px; margin: auto;">
+      <div class="section-message success">
+          <i class="pi pi-check-circle" style="font-size: 18px;"></i>
+          Fecha de Reserva
+        </div>
+
+      <!-- FECHA -->
+      <p-floatLabel variant="in">
+        <p-datePicker
+          id="fecha"
+          [(ngModel)]="reservaModal.fecha"
+          showButtonBar="true"
+          [dateFormat]="'dd-mm-yy'"
+          inputStyleClass="p-inputtext p-component"
+          appendTo="body"
+          placeholder="Seleccione una fecha"
+        ></p-datePicker>
+        <label for="fecha">Fecha</label>
+      </p-floatLabel>
+    </div>
+    
+    <div style="display: flex; gap: 20px">
+      <div style="display: flex; flex-direction: column; gap: 20px;">
+        <div class="section-message info">
+          <i class="pi pi-exclamation-circle" style="font-size: 18px;"></i>
+          Cliente
+        </div>
+
+        <!-- CLIENTE -->
+        <p-floatLabel variant="in">
+          <p-select
+            id="cliente"
+            [options]="clientes"
+            [(ngModel)]="reservaModal.id_cliente"
+            optionLabel="nombre"
+            optionValue="id"
+            appendTo="body"
+            filter="true"
+            style="width: 100%;"
+          ></p-select>
+          <label for="cliente">Cliente</label>
+        </p-floatLabel>
+
+        <!-- ASISTENTES -->
+        <p-floatLabel variant="in">
+          <input
+            id="asistentes"
+            type="number"
+            pInputText
+            [(ngModel)]="reservaModal.numero_asistentes"
+          />
+          <label for="asistentes">N° Asistentes</label>
+        </p-floatLabel>
+ 
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 20px;">
+        <div class="section-message info">
+          <i class="pi pi-exclamation-circle" style="font-size: 18px;"></i>
+          Pago
+        </div>
+        <!-- TOTAL -->
+        <p-floatLabel variant="in">
+          <input
+            id="total"
+            type="number"
+            pInputText
+            [(ngModel)]="reservaModal.total"
+          />
+          <label for="total">Total (S/)</label>
+        </p-floatLabel>
+
+        <!-- TIPO DE PAGO -->
+        <p-floatLabel variant="in">
+          <p-select
+            id="tipo_pago"
+            [options]="tiposPago"
+            [(ngModel)]="reservaModal.id_tipo_pago"
+            optionLabel="nombre"
+            optionValue="id"
+            appendTo="body"
+            filter="true"
+            style="width: 100%;"
+          >
+            <ng-template #footer>
+              <div class="p-3">
+                <p-button 
+                  label="Agregar Nueva" 
+                  severity="secondary" 
+                  variant="text"
+                  icon="pi pi-plus"
+                  (click)="abrirModalTipoPago()"
+                  [style]="{ width: '100%' }"
+                />
+              </div>
+            </ng-template>
+          </p-select>
+          <label for="tipo_pago">Tipo de Pago</label>
+        </p-floatLabel>
+
+        <!-- ADELANTO -->
+        <p-floatLabel variant="in">
+          <p-select
+            id="adelanto"
+            [options]="adelantos"
+            [(ngModel)]="reservaModal.id_adelanto"
+            optionLabel="valor"
+            optionValue="id"
+            appendTo="body"
+            filter="true"
+            style="width: 100%;"
+          >
+            <ng-template #footer>
+              <div class="p-3">
+                <p-button 
+                  label="Agregar Nueva" 
+                  severity="secondary" 
+                  variant="text"
+                  icon="pi pi-plus"
+                  (click)="abrirModalAdelanto()"
+                  [style]="{ width: '100%' }"
+                />
+              </div>
+            </ng-template>
+          </p-select>
+          <label for="adelanto">Adelanto</label>
+        </p-floatLabel>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 20px;">
+        <div class="section-message info">
+          <i class="pi pi-exclamation-circle" style="font-size: 18px;"></i>
+          Detalles de Reserva
+        </div>
+
+        <!-- EVENTO -->
+        <p-floatLabel variant="in">
+          <p-select
+            id="evento"
+            [options]="eventos"
+            [(ngModel)]="reservaModal.id_evento"
+            optionLabel="nombre"
+            optionValue="id"
+            appendTo="body"
+            filter="true"
+            style="width: 100%;"
+          >
+            <ng-template #footer>
+              <div class="p-3">
+                <p-button 
+                  label="Agregar Nueva" 
+                  severity="secondary" 
+                  variant="text"
+                  icon="pi pi-plus"
+                  (click)="abrirModalEvento()"
+                  [style]="{ width: '100%' }"
+                />
+              </div>
+            </ng-template>
+          </p-select>
+          <label for="evento">Evento</label>
+        </p-floatLabel>
+
+        <!-- UBICACIÓN -->
+        <p-floatLabel variant="in">
+          <p-select
+            id="ubicacion"
+            [options]="ubicaciones"
+            [(ngModel)]="reservaModal.id_ubicacion"
+            optionLabel="nombre"
+            optionValue="id"
+            appendTo="body"
+            filter="true"
+            style="width: 100%;"
+          >
+            <ng-template #footer>
+              <div class="p-3">
+                <p-button 
+                  label="Agregar Nueva" 
+                  severity="secondary" 
+                  variant="text"
+                  icon="pi pi-plus"
+                  (click)="abrirModalUbicacion()"
+                  [style]="{ width: '100%' }"
+                />
+              </div>
+            </ng-template>
+          </p-select>
+          <label for="ubicacion">Ubicación</label>
+        </p-floatLabel>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 20px;">
+        <div class="section-message info">
+          <i class="pi pi-exclamation-circle" style="font-size: 18px;"></i>
+          Recursos y Proveedores
+        </div>
+        <!-- Recursos -->
+        <p-floatLabel variant="in">
+          <p-multiSelect 
+            [options]="recursosDisponibles"
+            [(ngModel)]="reservaModal.recursos"
+            optionLabel="nombre_recurso"
+            optionValue="id"
+            defaultLabel="Seleccione recursos"
+            appendTo="body"
+            style="width: 100%;"
+          ></p-multiSelect>
+          <label>Recursos</label>
+        </p-floatLabel>
+
+        <!-- Proveedores -->
+        <p-floatLabel variant="in">
+          <p-multiSelect 
+            [options]="proveedores"
+            [(ngModel)]="reservaModal.proveedores"
+            optionLabel="nombre_empresa"
+            optionValue="id"
+            defaultLabel="Seleccione proveedores"
+            appendTo="body"
+            style="width: 100%;"
+          ></p-multiSelect>
+          <label>Proveedores</label>
+        </p-floatLabel>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="button-confirmar-cancelar">
+    <button 
+      pButton 
+      label="Guardar" 
+      icon="pi pi-check" 
+      (click)="guardarReserva()"
+    ></button>
+    <button
+      pButton
+      label="Cancelar"
+      icon="pi pi-times"
+      class="p-button-secondary"
+      (click)="cerrarModal()"
+    ></button>
+  </div>
+</p-dialog>
+
+<!-- ===== MODAL ELIMINAR ===== -->
+<p-dialog
+  [(visible)]="modalEliminarVisible"
+  [modal]="true"
+  [closable]="false"
+  [draggable]="false"
+  header="Eliminar Reserva"
+>
+  <p>
+    ¿Seguro que deseas eliminar la reserva
+    <strong>#{{ reservaModal.id }}</strong>?
+  </p>
+
+  <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px">
+    <button pButton label="Eliminar" icon="pi pi-check" (click)="eliminarReserva()"></button>
+    <button
+      pButton
+      label="Cancelar"
+      icon="pi pi-times"
+      class="p-button-secondary"
+      (click)="cerrarModalEliminar()"
+    ></button>
+  </div>
+</p-dialog>
+
+
+
+<!-- Modales Ubicación -->
+<p-dialog [(visible)]="modalUbicaciones" header="Gestión de Ubicaciones" [modal]="true" [style]="{width:'70vw', height:'80vh'}" appendTo="body">
+  <div>
+    <input pInputText [(ngModel)]="busquedaUbicacion" placeholder="Buscar..." (input)="filtrarUbicaciones()" />
+    <button pButton label="Agregar" icon="pi pi-plus" (click)="abrirModalAgregarUbicacion()"></button>
+    <p-table [value]="ubicacionesFiltradas">
+      <ng-template pTemplate="header">
+        <tr><th>Nombre</th><th>Acciones</th></tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-u>
+        <tr>
+          <td>{{ u.nombre }}</td>
+          <td>
+            <button pButton icon="pi pi-pencil" class="p-button-text" (click)="abrirModalEditarUbicacion(u)"></button>
+            <button pButton icon="pi pi-trash" class="p-button-text" (click)="abrirModalEliminarUbicacion(u)"></button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</p-dialog>
+
+<!-- Modales Evento -->
+<p-dialog [(visible)]="modalEventos" header="Gestión de Eventos" [modal]="true" [style]="{width:'70vw', height:'80vh'}" appendTo="body">
+  <div>
+    <input pInputText [(ngModel)]="busquedaEvento" placeholder="Buscar..." (input)="filtrarEventos()" />
+    <button pButton label="Agregar" icon="pi pi-plus" (click)="abrirModalAgregarEvento()"></button>
+    <p-table [value]="eventosFiltrados">
+      <ng-template pTemplate="header">
+        <tr><th>Nombre</th><th>Estado</th><th>Acciones</th></tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-e>
+        <tr>
+          <td>{{ e.nombre }}</td>
+          <td>{{ e.estado }}</td>
+          <td>
+            <button pButton icon="pi pi-pencil" class="p-button-text" (click)="abrirModalEditarEvento(e)"></button>
+            <button pButton icon="pi pi-trash" class="p-button-text" (click)="abrirModalEliminarEvento(e)"></button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</p-dialog>
+
+
+<!-- Modal Principal de Ubicaciones -->
+<p-dialog 
+    [(visible)]="modalUbicaciones" 
+    [modal]="true" 
+    [style]="{ width: '70vw', height: '80vh' }"
+    [draggable]="false" 
+    header="Gestión de Ubicaciones"
+    appendTo="body"
+>
+    <div style="width:90%; margin:auto; margin-top:20px;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+            <input 
+                pInputText 
+                [(ngModel)]="busquedaUbicacion" 
+                placeholder="Buscar ubicación..." 
+                (input)="filtrarUbicaciones()" 
+                style="flex:1; margin-right:10px;"
+            />
+            <button pButton label="Agregar Ubicación" icon="pi pi-plus" (click)="abrirModalAgregarUbicacion()"></button>
+        </div>
+
+        <p-table [value]="ubicacionesFiltradas">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Acciones</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-ubicacion>
+                <tr>
+                    <td>{{ ubicacion.nombre }}</td>
+                    <td>
+                        <button pButton icon="pi pi-pencil" class="p-button-text" (click)="abrirModalEditarUbicacion(ubicacion)"></button>
+                        <button pButton icon="pi pi-trash" class="p-button-text" (click)="abrirModalEliminarUbicacion(ubicacion)"></button>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+
+    <!-- Modal Agregar / Editar Ubicación -->
+    <p-dialog 
+        [(visible)]="modalVisibleUbicacion" 
+        [modal]="true" 
+        [closable]="false" 
+        header="{{ modalTituloUbicacion }}" 
+        appendTo="body"
+    >
+        <div class="p-fluid" style="display:flex; flex-direction:column; gap:15px;">
+            <p-floatLabel variant="in">
+                <input pInputText [(ngModel)]="ubicacionModal.nombre" required />
+                <label>Nombre</label>
+            </p-floatLabel>
+        </div>
+        <div class="button-confirmar-cancelar" style="gap:10px; margin-top:10px;">
+            <button pButton label="Guardar" icon="pi pi-check" (click)="guardarUbicacion()"></button>
+            <button pButton label="Cancelar" icon="pi pi-times" class="p-button-secondary" (click)="cerrarModalUbicacion()"></button>
+        </div>
+    </p-dialog>
+
+    <!-- Modal Eliminar Ubicación -->
+    <p-dialog 
+        [(visible)]="modalEliminarVisibleUbicacion" 
+        [modal]="true" 
+        [closable]="false" 
+        header="Eliminar Ubicación" 
+        appendTo="body"
+    >
+        <p>¿Deseas eliminar <strong>{{ ubicacionSeleccionadaObj?.nombre }}</strong>?</p>
+        <div class="button-confirmar-cancelar" style="gap:10px; margin-top:10px;">
+            <button pButton label="Eliminar" icon="pi pi-check" (click)="eliminarUbicacion()"></button>
+            <button pButton label="Cancelar" icon="pi pi-times" class="p-button-secondary" (click)="cerrarModalEliminarUbicacion()"></button>
+        </div>
+    </p-dialog>
+</p-dialog>
+
+
+<!-- Modal Principal de Eventos -->
+<p-dialog 
+    [(visible)]="modalEventos" 
+    [modal]="true" 
+    [style]="{ width: '70vw', height: '80vh' }"
+    [draggable]="false" 
+    header="Gestión de Eventos"
+    appendTo="body"
+>
+    <div style="width:90%; margin:auto; margin-top:20px;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+            <input 
+                pInputText 
+                [(ngModel)]="busquedaEvento" 
+                placeholder="Buscar evento..." 
+                (input)="filtrarEventos()" 
+                style="flex:1; margin-right:10px;"
+            />
+            <button pButton label="Agregar Evento" icon="pi pi-plus" (click)="abrirModalAgregarEvento()"></button>
+        </div>
+
+        <p-table [value]="eventosFiltrados">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-evento>
+                <tr>
+                    <td>{{ evento.nombre }}</td>
+                    <td>{{ evento.estado }}</td>
+                    <td>
+                        <button pButton icon="pi pi-pencil" class="p-button-text" (click)="abrirModalEditarEvento(evento)"></button>
+                        <button pButton icon="pi pi-trash" class="p-button-text" (click)="abrirModalEliminarEvento(evento)"></button>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+
+    <!-- Modal Agregar / Editar Evento -->
+    <p-dialog 
+        [(visible)]="modalVisibleEvento" 
+        [modal]="true" 
+        [closable]="false" 
+        header="{{ modalTituloEvento }}" 
+        appendTo="body"
+    >
+        <div class="p-fluid" style="display:flex; flex-direction:column; gap:15px;">
+            <p-floatLabel variant="in">
+                <input pInputText [(ngModel)]="eventoModal.nombre" required />
+                <label>Nombre</label>
+            </p-floatLabel>
+
+            <p-floatLabel variant="in">
+                <p-select [(ngModel)]="eventoModal.estado" [options]="estadosEvento" placeholder="Selecciona Estado" appendTo="body"></p-select>
+                <label>Estado</label>
+            </p-floatLabel>
+        </div>
+        <div class="button-confirmar-cancelar" style="gap:10px; margin-top:10px;">
+            <button pButton label="Guardar" icon="pi pi-check" (click)="guardarEvento()"></button>
+            <button pButton label="Cancelar" icon="pi pi-times" class="p-button-secondary" (click)="cerrarModalEvento()"></button>
+        </div>
+    </p-dialog>
+
+    <!-- Modal Eliminar Evento -->
+    <p-dialog 
+        [(visible)]="modalEliminarVisibleEvento" 
+        [modal]="true" 
+        [closable]="false" 
+        header="Eliminar Evento" 
+        appendTo="body"
+    >
+        <div class="button-confirmar-cancelar" style="gap:10px; margin-top:10px;">
+            <button pButton label="Eliminar" icon="pi pi-check" (click)="eliminarEvento()"></button>
+            <button pButton label="Cancelar" icon="pi pi-times" class="p-button-secondary" (click)="cerrarModalEliminarEvento()"></button>
+        </div>
+    </p-dialog>
+</p-dialog>
+
+
+<!-- Tipo Pago-->
+<!-- Modal Principal de Tipo Pago -->
+<p-dialog 
+    [(visible)]="modalTipoPago" 
+    [modal]="true" 
+    [style]="{ width: '70vw', height: '80vh' }"
+    [draggable]="false" 
+    header="Gestión de Tipo de pagos"
+    appendTo="body"
+>
+    <div style="width:90%; margin:auto; margin-top:20px;">
+    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+        <input pInputText [(ngModel)]="busquedaTipoPago" placeholder="Buscar tipo de pago..." (input)="filtrarTipos()" style="flex:1; margin-right:10px;"/>
+        <button pButton label="Agregar Tipo de pago" icon="pi pi-plus" (click)="abrirModalAgregarTipoPago()"></button>
+    </div>
+
+    <p-table [value]="tiposFiltrados">
+        <ng-template pTemplate="header">
+        <tr>
+            <th>Nombre</th>
+            <th>Acciones</th>
+        </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-tipo>
+        <tr>
+            <td>{{ tipo.nombre }}</td>
+            <td>
+            <button pButton icon="pi pi-pencil" class="p-button-text" (click)="abrirModalEditarTipoPago(tipo)"></button>
+            <button pButton icon="pi pi-trash" class="p-button-text" (click)="abrirModalEliminarTipoPago(tipo)"></button>
+            </td>
+        </tr>
+        </ng-template>
+    </p-table>
+    </div>
+
+    <!-- Modal Agregar / Editar Tipo -->
+    <p-dialog [(visible)]="modalVisibleTipoPago" [modal]="true" [closable]="false" header="{{ modalTitulo }}" appendTo="body">
+    <div class="p-fluid" style="display:flex; flex-direction:column; gap:15px;">
+        <p-floatLabel variant="in">
+        <input pInputText [(ngModel)]="tipoModal.nombre" required />
+        <label>Nombre</label>
+        </p-floatLabel>
+    </div>
+    <div class="button-confirmar-cancelar" style="gap:10px; margin-top:10px;">
+        <button pButton label="Guardar" icon="pi pi-check" (click)="guardarTipoPago()"></button>
+        <button pButton label="Cancelar" icon="pi pi-times" class="p-button-secondary" (click)="cerrarModalTipoPago()"></button>
+    </div>
+    </p-dialog>
+
+    <!-- Modal Eliminar Tipo -->
+    <p-dialog [(visible)]="modalEliminarVisibleTipoPago" [modal]="true" [closable]="false" header="Eliminar Tipo de Pago" appendTo="body">
+    <p>¿Deseas eliminar el tipo de pago <strong>{{ tipoSeleccionado.nombre }}</strong>?</p>
+    <div class="button-confirmar-cancelar" style="gap:10px; margin-top:10px;">
+        <button pButton label="Eliminar" icon="pi pi-check" (click)="eliminarTipoPago()"></button>
+        <button pButton label="Cancelar" icon="pi pi-times" class="p-button-secondary" (click)="cerrarModalEliminarTipoPago()"></button>
+    </div>
+    </p-dialog>
+</p-dialog>
+
+<!-- Adelanto-->
+<!-- Modal Principal de Adelanto -->
+<p-dialog 
+    [(visible)]="modalAdelanto" 
+    [modal]="true" 
+    [style]="{ width: '70vw', height: '80vh' }"
+    [draggable]="false" 
+    header="Gestión de Adelantos"
+    appendTo="body"
+>
+
+    <div style="width:90%; margin:auto; margin-top:20px;">
+    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+        <input pInputText [(ngModel)]="busquedaAdelanto" placeholder="Buscar adelanto..." (input)="filtrarAdelantos()" style="flex:1; margin-right:10px;"/>
+        <button pButton label="Agregar Adelanto" icon="pi pi-plus" (click)="abrirModalAgregarAdelanto()"></button>
+    </div>
+
+    <p-table [value]="adelantosFiltrados">
+        <ng-template pTemplate="header">
+        <tr>
+            <th>Valor (%)</th>
+            <th>Acciones</th>
+        </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-adelanto>
+        <tr>
+            <td>{{ adelanto.valor }}</td>
+            <td>
+            <button pButton icon="pi pi-pencil" class="p-button-text" (click)="abrirModalEditarAdelanto(adelanto)"></button>
+            <button pButton icon="pi pi-trash" class="p-button-text" (click)="abrirModalEliminarAdelanto(adelanto)"></button>
+            </td>
+        </tr>
+        </ng-template>
+    </p-table>
+    </div>
+
+    <!-- Modal Agregar / Editar Adelanto -->
+    <p-dialog [(visible)]="modalVisibleAdelanto" [modal]="true" [closable]="false" header="{{ modalTituloAdelanto }}" appendTo="body">
+    <div class="p-fluid" style="display:flex; flex-direction:column; gap:15px;">
+        <p-floatLabel variant="in">
+        <input pInputText type="number" [(ngModel)]="adelantoModal.valor" required />
+        <label>Valor</label>
+        </p-floatLabel>
+    </div>
+    <div class="button-confirmar-cancelar" style="gap:10px; margin-top:10px;">
+        <button pButton label="Guardar" icon="pi pi-check" (click)="guardarAdelanto()"></button>
+        <button pButton label="Cancelar" icon="pi pi-times" class="p-button-secondary" (click)="cerrarModalAdelanto()"></button>
+    </div>
+    </p-dialog>
+
+    <!-- Modal Eliminar Adelanto -->
+    <p-dialog [(visible)]="modalEliminarVisibleAdelanto" [modal]="true" [closable]="false" header="Eliminar Adelanto" appendTo="body">
+    <p>¿Deseas eliminar el adelanto <strong>{{ adelantoSeleccionado.valor }}</strong>?</p>
+    <div class="button-confirmar-cancelar" style="gap:10px; margin-top:10px;">
+        <button pButton label="Eliminar" icon="pi pi-check" (click)="eliminarAdelanto()"></button>
+        <button pButton label="Cancelar" icon="pi pi-times" class="p-button-secondary" (click)="cerrarModalEliminarAdelanto()"></button>
+    </div>
+    </p-dialog>
+</p-dialog>
