@@ -2,7 +2,8 @@ import { Component, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { PrimeNG } from 'primeng/config';
-
+import { AuthService } from '../service/auth.service';
+import { AuthStateService } from '../service/auth-state.service';
 interface TabButton {
   label: string;
   icon?: string;
@@ -35,10 +36,16 @@ interface ParentButton {
   styleUrl: './app.css'
 })
 export class App {
+
+  isLogged: boolean = false;
+
+  username: string | null = null;
+  rol: string | null = null;
+  correo: string | null = null;
+
   protected readonly title = signal('frontend');
 
   isAuthenticated: boolean = false;
-  username: string | null = null;
 
   // Control del drawer
   visibleMenuDrawer: boolean = true;
@@ -49,10 +56,33 @@ export class App {
   constructor(
     private router: Router,
     private primeng: PrimeNG,
+    private authService: AuthService,
+    private AuthStateService: AuthStateService
   ) {
   }
 
   ngOnInit() {
+    // Verificar si ya hay sesión
+    this.authStatusSubscription = this.AuthStateService.logged$.subscribe(logged => {
+      this.isLogged = logged;
+
+      if (logged) {
+        // Actualiza los datos del perfil desde localStorage
+        this.username = localStorage.getItem('user');
+        this.rol = localStorage.getItem('rol');
+        this.correo = localStorage.getItem('correo');
+
+        // Redirigir si estamos en login
+        if (this.router.url === '/iniciosesion') {
+          this.router.navigate(['/panelgeneral']);
+        }
+      } else {
+        this.username = null;
+        this.rol = null;
+        this.correo = null;
+      }
+    });
+
     this.primeng.setTranslation({
       firstDayOfWeek: 1,
       dayNames: [
@@ -80,6 +110,8 @@ export class App {
     });
   }
 
+  
+
   ngOnDestroy() {
     // Limpieza de la suscripción cuando el componente se destruye
     if (this.authStatusSubscription) {
@@ -87,13 +119,18 @@ export class App {
     }
   }
 
-  cerrarSesion(): void {
-    this.visibleProfileDrawer = false;
-    localStorage.clear();
-    sessionStorage.clear();
-    
-    this.router.navigate(['/logindashboard']);
+  cerrarSesion() {
+    this.authService.logout().subscribe({
+      next: (res) => {
+        this.isLogged = false;
+        this.visibleProfileDrawer = false;
+        localStorage.clear();
+        this.router.navigate(['/iniciosesion']);
+      },
+
+    });
   }
+  
   toggleDrawer(): void {
     this.visibleMenuDrawer = !this.visibleMenuDrawer;
   }
@@ -102,14 +139,13 @@ export class App {
   currentLabel: string = '';
   
   menuItems = [
-    { label: 'Panel General', icon: 'pi pi-th-large', route: '/' },
+    { label: 'Panel General', icon: 'pi pi-th-large', route: '/panelgeneral' },
     { label: 'Reservas', icon: 'pi pi-calendar', route: '/reservas' },
     { label: 'Recursos', icon: 'pi pi-box', route: '/recursos' },
     { label: 'Proveedores', icon: 'pi pi-building', route: '/proveedores' },
     { label: 'Clientes', icon: 'pi pi-user', route: '/clientes' },
     { label: 'Pagos', icon: 'pi pi-credit-card', route: '/pagos' },
-    { label: 'Notificaciones', icon: 'pi pi-bell', route: '/' },
-    { label: 'Configuración', icon: 'pi pi-cog', route: '/' },
+    { label: 'Usuarios', icon: 'pi pi-users', route: '/usuarios' },
   ];
 
   setActive(route: string) {

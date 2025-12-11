@@ -27,6 +27,10 @@ function validarUsuarioDatos($data) {
         $errores[] = 'El formato del "correo" no es válido.';
     }
     
+    // Validar contraseña solo al crear
+    if (!isset($data['password']) || empty($data['password'])) {
+        $errores[] = 'La contraseña es obligatoria.';
+    }
     
     if (isset($data['estado']) && !empty($data['estado'])) {
         $estadosValidos = ['Activo', 'Inactivo'];

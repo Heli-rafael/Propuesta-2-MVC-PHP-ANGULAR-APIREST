@@ -1,6 +1,6 @@
 <?php
 require_once 'conexion.php';
-require_once __DIR__ . '/../validations/usuario.validations.php';
+
 
 class Usuario {
     private $pdo;
@@ -33,10 +33,23 @@ class Usuario {
 
     public function crear($data) {
         try {
-            $stmt = $this->pdo->prepare("INSERT INTO Usuario (nombre, correo, estado, id_rol) VALUES (:nombre, :correo, :estado, :id_rol)");
+            // Validar que exista password
+            if (empty($data['password'])) {
+                echo json_encode(['error' => 'La password es obligatoria']);
+                return;
+            }
+
+            // Hashear la password antes de guardarla
+            $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
+
+            $stmt = $this->pdo->prepare("
+                INSERT INTO Usuario (nombre, correo, password, estado, id_rol) 
+                VALUES (:nombre, :correo, :password, :estado, :id_rol)
+            ");
             $stmt->execute([
                 ':nombre' => $data['nombre'],
                 ':correo' => $data['correo'],
+                ':password' => $hashedPassword,
                 ':estado' => $data['estado'] ?? 'Activo',
                 ':id_rol' => $data['id_rol'] ?? null
             ]);
@@ -48,14 +61,27 @@ class Usuario {
 
     public function actualizar($id, $data) {
         try {
-            $stmt = $this->pdo->prepare("UPDATE Usuario SET nombre = :nombre, correo = :correo, estado = :estado, id_rol = :id_rol WHERE id = :id");
-            $stmt->execute([
+            $fields = [
                 ':id' => $id,
                 ':nombre' => $data['nombre'],
                 ':correo' => $data['correo'],
                 ':estado' => $data['estado'],
                 ':id_rol' => $data['id_rol']
-            ]);
+            ];
+
+            $sql = "UPDATE Usuario SET nombre = :nombre, correo = :correo, estado = :estado, id_rol = :id_rol";
+
+            // Si se proporciona password, la actualizamos también
+            if (!empty($data['password'])) {
+                $sql .= ", password = :password";
+                $fields[':password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+            }
+
+            $sql .= " WHERE id = :id";
+
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute($fields);
+
             echo json_encode(['success' => true]);
         } catch (PDOException $e) {
             echo json_encode(['error' => $e->getMessage()]);
@@ -71,6 +97,22 @@ class Usuario {
             echo json_encode(['error' => $e->getMessage()]);
         }
     }
-}
 
+    // Método opcional para verificar password al iniciar sesión
+    public function verificarLogin($correo, $password) {
+        try {
+            $stmt = $this->pdo->prepare("SELECT * FROM Usuario WHERE correo = :correo");
+            $stmt->execute([':correo' => $correo]);
+            $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($usuario && password_verify($password, $usuario['password'])) {
+                echo json_encode(['success' => true, 'usuario' => $usuario]);
+            } else {
+                echo json_encode(['error' => 'Correo o password incorrectos']);
+            }
+        } catch (PDOException $e) {
+            echo json_encode(['error' => $e->getMessage()]);
+        }
+    }
+}
 ?>

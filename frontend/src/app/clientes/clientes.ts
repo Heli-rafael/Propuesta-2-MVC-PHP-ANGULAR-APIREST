@@ -17,9 +17,6 @@ export class Clientes {
   busqueda: string = "";
   filtroLetra: string | null = null;
 
-  // Resumen
-  totalClientes = 0;
-
   // Modal
   modalVisible = false;
   modalEliminarVisible = false;
@@ -42,7 +39,6 @@ export class Clientes {
   cargarClientes() {
     this.clientesService.listar().subscribe(res => {
       this.clientes = res || [];
-      this.totalClientes = this.clientes.length;
       this.clientesFiltrados = [...this.clientes];
     });
   }

@@ -1,0 +1,254 @@
+<div style="width: 90%; margin: auto; padding: 3% 0;">
+  <div style="display: flex; justify-content: space-between; gap: 20px;">
+    <div style="flex: 1;">
+      <input
+        pInputText
+        [(ngModel)]="busqueda"
+        placeholder="Buscar usuario..."
+        (input)="filtrar()"
+        style="width: 100%; padding: 8px; border-radius: 4px;"
+      />
+    </div>
+
+    <button pButton label="Agregar Usuario" icon="pi pi-plus" (click)="abrirModalAgregar()"></button>
+  </div>
+</div>
+
+<div style="width: 90%; margin: auto; display: flex; gap: 20px; flex-wrap: wrap;">
+  <p-card *ngFor="let u of usuariosFiltrados" [style]="{'width':'330px'}">
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 15px;">
+      <i class="pi pi-user" style="font-size: 2.5rem"></i>
+      <div style="flex: 1; font-weight: bold;">
+        {{ u.nombre }}<br>
+        (ID-{{ u.id }})<br>
+        <small></small>
+      </div>
+      <div style="font-weight: bold;">
+        <i 
+          class="
+            {{ u.rol === 'Administrador' ? 'pi pi-shield' :
+              u.rol === 'Supervisor' ? 'pi pi-briefcase' :
+              u.rol === 'Empleado' ? 'pi pi-user' :
+              'pi pi-question-circle'
+            }}"
+          style="margin-right: 6px; font-weight: bold;"
+        ></i>
+        {{ u.rol }}
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 120px auto; row-gap: 10px; font-size: 14px; margin: 15px 0;">
+        <div><strong>Correo:</strong></div>
+        <div style="text-align: right;">{{ u.correo }}</div>
+
+        <div><strong>Estado:</strong></div>
+        <div style="text-align: right;">{{ u.estado }}</div>
+
+        <div><strong>Registro:</strong></div>
+        <div style="text-align: right;">{{ u.fecha_registro }}</div>
+    </div>
+
+    <div style="display: flex; gap: 5px;">
+      <button pButton label="Editar" icon="pi pi-pencil" class="p-button-outlined" style="flex: 3;" (click)="abrirModalEditar(u)"></button>
+      <button pButton icon="pi pi-trash" severity="danger" class="p-button-outlined" style="flex: 1;" (click)="abrirModalEliminar(u)"></button>
+    </div>
+  </p-card>
+</div>
+
+<p-table [value]="usuariosFiltrados" [paginator]="true" [rows]="10" [responsiveLayout]="'scroll'" style="width: 90%; margin: auto; margin-top: 30px;">
+  <ng-template pTemplate="header">
+    <tr>
+      <th>ID</th>
+      <th>Nombre</th>
+      <th>Correo</th>
+      <th>Rol</th>
+      <th>Registro</th>
+      <th>Estado</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-u>
+    <tr>
+      <td>{{ u.id }}</td>
+      <td>{{ u.nombre }}</td>
+      <td>{{ u.correo }}</td>
+      <td>{{ u.rol }}</td>
+      <td>{{ u.fecha_registro }}</td>
+      <td>
+        <p-tag
+          [value]="u.estado"
+          [icon]="
+            u.estado === 'Activo' ? 'pi pi-check-circle' :
+            u.estado === 'Inactivo' ? 'pi pi-info-circle' :
+            'pi pi-exclamation-circle'
+          "
+          [severity]="
+            u.estado === 'Activo' ? 'success' :
+            u.estado === 'Inactivo' ? 'danger' :
+            'warn'
+          ">
+        </p-tag>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
+
+<p-dialog [(visible)]="modalVisible" [modal]="true" [closable]="false" [draggable]="false" [header]="modalTitulo">
+  <div class="p-fluid" style="display: flex; flex-direction: column; gap: 15px;">
+    <p-floatLabel variant="in">
+      <input pInputText [(ngModel)]="usuarioModal.nombre" required />
+      <label>Nombre</label>
+    </p-floatLabel>
+
+    <p-floatLabel variant="in">
+      <input pInputText [(ngModel)]="usuarioModal.correo" required />
+      <label>Correo</label>
+    </p-floatLabel>
+
+    <p-floatLabel variant="in">
+      <input pInputText [(ngModel)]="usuarioModal.password" type="password" [required]="!usuarioModal.id" />
+      <label>Contraseña</label>
+    </p-floatLabel>
+
+    <!-- Rol -->
+    <p-floatLabel variant="in">
+      <p-select
+        [options]="roles"
+        [(ngModel)]="usuarioModal.id_rol"
+        optionLabel="nombre"
+        optionValue="id"
+        appendTo="body" 
+        style="width: 100%;"
+        >
+        <ng-template #footer>
+          <div class="p-3">
+              <p-button 
+                label="Agregar nueva" 
+                icon="pi pi-plus"
+                severity="secondary"
+                variant="text"
+                (click)="abrirModalRoles()"
+                [style]="{ width: '100%' }"
+              />
+          </div>
+        </ng-template>
+      </p-select>
+      <label>Rol</label>
+    </p-floatLabel>
+
+    <!-- Estado -->
+    <p-floatLabel variant="in">
+      <p-select
+        [options]="estados"
+        [(ngModel)]="usuarioModal.estado"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body" 
+        style="width: 100%;">
+      </p-select>
+      <label>Estado</label>
+    </p-floatLabel>
+  </div>
+
+  <div class="button-confirmar-cancelar" style="gap: 10px; margin-top: 15px;">
+    <button pButton label="Guardar" icon="pi pi-check" (click)="guardar()"></button>
+    <button pButton label="Cancelar" icon="pi pi-times" class="p-button-secondary" (click)="cerrarModal()"></button>
+  </div>
+</p-dialog>
+
+<p-dialog [(visible)]="modalEliminarVisible" [modal]="true" [closable]="false" [draggable]="false" header="Eliminar Usuario">
+  <p>¿Estás seguro de que deseas eliminar al usuario <strong>{{ usuarioSeleccionado?.nombre }}</strong>?</p>
+  <div class="button-confirmar-cancelar" style="gap: 10px; margin-top: 15px;">
+    <button pButton label="Eliminar" icon="pi pi-check" severity="danger" (click)="eliminar()"></button>
+    <button pButton label="Cancelar" icon="pi pi-times" class="p-button-secondary" (click)="cerrarModalEliminar()"></button>
+  </div>
+</p-dialog>
+
+
+<!-- Modal Roles -->
+<p-dialog 
+    [(visible)]="modalRoles" 
+    [modal]="true" 
+    [style]="{ width: '70vw', height: '80vh' }"
+    [draggable]="false" 
+    header="Gestión de Roles"
+    appendTo="body"
+>
+    <div style="width: 100%; height: 100%; overflow-y: auto;">
+        
+        <!-- Barra superior -->
+        <div style="width: 90%; margin: auto; padding: 2% 0; display: flex; justify-content: space-between;">
+            <input 
+                pInputText 
+                [(ngModel)]="busquedaRol" 
+                placeholder="Buscar rol..." 
+                (input)="filtrarRol()" 
+                style="width: 60%;" 
+            />
+            <button pButton label="Agregar Rol" icon="pi pi-plus" (click)="abrirModalAgregarRol()"></button>
+        </div>
+
+        <!-- Tabla -->
+        <div style="width: 90%; margin: auto;">
+            <p-table [value]="rolesFiltrados">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Acciones</th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-r>
+                    <tr>
+                        <td>{{ r.nombre }}</td>
+                        <td>
+                            <button pButton icon="pi pi-eye" class="p-button-text" (click)="abrirModalVerRol(r)"></button>
+                            <button pButton icon="pi pi-pencil" class="p-button-text" (click)="abrirModalEditarRol(r)"></button>
+                            <button pButton icon="pi pi-trash" class="p-button-text" (click)="abrirModalEliminarRol(r)"></button>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+
+    </div>
+
+    <!-- Modal Agregar / Editar -->
+    <p-dialog [(visible)]="modalFormRol" [modal]="true" [closable]="false" header="{{ modalTituloRol }}" appendTo="body">
+        <div class="p-fluid" style="display:flex; flex-direction:column; gap:15px;">
+            <p-floatLabel variant="in">
+                <input pInputText [(ngModel)]="rolModal.nombre" required />
+                <label>Nombre del rol</label>
+            </p-floatLabel>
+        </div>
+
+        <div class="button-confirmar-cancelar" style="gap: 10px; margin-top: 10px;">
+            <button pButton label="Guardar" icon="pi pi-check" (click)="guardarRol()"></button>
+            <button pButton label="Cancelar" icon="pi pi-times" class="p-button-secondary" (click)="cerrarModalRol()"></button>
+        </div>
+    </p-dialog>
+
+    <!-- Modal Ver -->
+    <p-dialog [(visible)]="modalVerRol" [modal]="true" [closable]="false" header="Ver Rol" appendTo="body">
+        <div class="p-fluid no-gray">
+            <p-floatLabel variant="in">
+                <input pInputText [value]="rolSeleccionado.nombre" disabled />
+                <label>Nombre</label>
+            </p-floatLabel>
+        </div>
+
+        <div class="button-confirmar-cancelar">
+            <button pButton label="Cerrar" icon="pi pi-times" (click)="cerrarModalVerRol()"></button>
+        </div>
+    </p-dialog>
+
+    <!-- Modal Eliminar -->
+    <p-dialog [(visible)]="modalEliminarRol" [modal]="true" [closable]="false" header="Eliminar Rol" appendTo="body">
+        <p>¿Deseas eliminar el rol <strong>{{ rolSeleccionado.nombre }}</strong>?</p>
+
+        <div class="button-confirmar-cancelar" style="gap: 10px; margin-top: 10px;">
+            <button pButton label="Eliminar" icon="pi pi-check" (click)="eliminarRol()"></button>
+            <button pButton label="Cancelar" icon="pi pi-times" class="p-button-secondary" (click)="cerrarModalEliminarRol()"></button>
+        </div>
+    </p-dialog>
+
+</p-dialog>

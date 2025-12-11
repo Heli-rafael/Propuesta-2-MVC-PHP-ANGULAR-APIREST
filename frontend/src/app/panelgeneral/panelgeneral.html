@@ -1,0 +1,62 @@
+<div style="width: 90%; margin: auto;">
+  <div class="resumenes" style="display:flex; gap:20px; margin-bottom:20px;">
+    <p-card header="Reservas Activas" [style]="{flex: '1'}">
+      <h2>{{ reservasActivas }}</h2>
+    </p-card>
+    <p-card header="Adelantos Recibidos" [style]="{flex: '1'}">
+      <h2>S/. {{ adelantosRecibidos }}</h2>
+    </p-card>
+    <p-card header="Pagos Pendientes" [style]="{flex: '1'}">
+      <h2>S/. {{ pagosPendientes }}</h2>
+    </p-card>
+    <p-card header="Empleados Activos" [style]="{flex: '1'}">
+      <h2>{{ empleadosActivos }}</h2>
+    </p-card>
+  </div>
+
+
+  <!-- Gráficos principales en fila -->
+  <div class="diagramas" style="display:flex; gap: 30px;">
+    <p-card header="Total en Reserva vs Adelantos vs Pagos Pendientes" [style]="{flex: '1 1 45%'}">
+      <p-chart type="bar" [data]="barData" [options]="barOptions"></p-chart>
+    </p-card>
+
+    <p-card header="Tipos de Eventos" [style]="{flex: '1 0 15%'}">
+      <p-chart type="doughnut" [data]="pieData" [options]="pieOptions"></p-chart>
+    </p-card>
+  </div>
+
+  <!-- Tendencia de Reservas abajo -->
+  <div class="tendencia" style="margin-bottom:20px;">
+    <p-card header="Tendencia de Reservas" [style]="{flex: '1 1 100%'}">
+      <p-chart type="line" [data]="lineData" [options]="lineOptions"></p-chart>
+    </p-card>
+  </div>
+
+  <!-- Reservas recientes -->
+  <div class="reservas-recientes" style="margin-top:20px;">
+    <p-card header="Reservas Recientes">
+      <p-table [value]="reservasRecientes">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Cliente</th>
+            <th>Evento</th>
+            <th>Fecha</th>
+            <th>Total</th>
+            <th>Estado</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-r>
+          <tr>
+            <td>{{ getNombreCliente(r.id_cliente) }}</td>
+            <td>{{ getNombreEvento(r.id_evento) }}</td>
+            <td>{{ r.fecha | date:'dd/MM/yyyy' }}</td>
+            <td>S/. {{ r.total }}</td>
+            <td>{{ r.estado }}</td>
+          </tr>
+        </ng-template>
+
+      </p-table>
+    </p-card>
+  </div>
+</div>

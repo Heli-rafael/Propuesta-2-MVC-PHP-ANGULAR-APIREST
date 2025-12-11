@@ -12,6 +12,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 require_once '../componentes/usuario.php';
+require_once '../validations/usuario.validations.php';
+
 
 $usuario = new Usuario();
 $accion = $_GET['accion'] ?? '';
@@ -40,6 +42,15 @@ switch($accion) {
     case 'eliminar':
         $id = $_GET['id'] ?? 0;
         $usuario->eliminar($id);
+        break;
+
+    case 'checksession':
+        session_start();
+        if (isset($_SESSION['user'])) {
+            echo json_encode(['logged' => true, 'user' => $_SESSION['user']]);
+        } else {
+            echo json_encode(['logged' => false]);
+        }
         break;
 
     default:

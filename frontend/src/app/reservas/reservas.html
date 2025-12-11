@@ -173,7 +173,7 @@
   <p-card
     *ngFor="let r of reservasFiltradas"
     styleClass="reserva-card"
-    [style]="{ width: '350px' }"
+    [style]="{ width: '330px' }"
   >
     <!-- ENCABEZADO -->
     <div
@@ -285,9 +285,8 @@
         <th>Fecha</th>
         <th>Total (S/)</th>
         <th>Adelanto (S/)</th>
-        <th>Saldo (S/)</th>
+        <th>Por Pagar (S/)</th>
         <th>Estado</th>
-        <th>Acciones</th>
       </tr>
     </ng-template>
 
@@ -317,20 +316,6 @@
             "
             size="small"
           ></p-message>
-        </td>
-        <td style="display: flex; gap: 10px;">
-          <button 
-            pButton 
-            icon="pi pi-pencil" 
-            class="p-button-rounded p-button-outlined " 
-            (click)="abrirModalEditar(r)"
-          ></button>
-          <button 
-            pButton 
-            icon="pi pi-trash" 
-            class="p-button-rounded p-button-outlined p-button-danger" 
-            (click)="abrirModalEliminar(r)"
-          ></button>
         </td>
       </tr>
     </ng-template>

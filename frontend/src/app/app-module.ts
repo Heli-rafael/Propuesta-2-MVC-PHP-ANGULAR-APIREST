@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms'; // <<-- IMPORTANTE
 
 import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
-import { Roles } from './roles/roles';
 
 // PrimeNG
 import { HttpClientModule } from '@angular/common/http'; // <-- aquí
@@ -34,16 +33,23 @@ import { Pagos } from './pagos/pagos';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { ChipModule } from 'primeng/chip';
+import { TagModule } from 'primeng/tag';
+import { Iniciosesion } from './iniciosesion/iniciosesion';
+import { Panelgeneral } from './panelgeneral/panelgeneral';
+import { Usuarios } from './usuarios/usuarios';
+import { ChartModule } from 'primeng/chart';
 
 @NgModule({
   declarations: [
     App,
-    Roles,
     Recursos,
     Proveedores,
     Reservas,
     Clientes,
-    Pagos
+    Pagos,
+    Iniciosesion,
+    Panelgeneral,
+    Usuarios
   ],
   imports: [
     BrowserModule,
@@ -66,7 +72,9 @@ import { ChipModule } from 'primeng/chip';
     DatePickerModule,
     ReactiveFormsModule,
     MultiSelectModule,
-    ChipModule
+    ChipModule,
+    TagModule,
+    ChartModule
   ],
   providers: [
     provideBrowserGlobalErrorListeners(),

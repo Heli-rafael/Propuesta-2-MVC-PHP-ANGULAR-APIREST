@@ -262,10 +262,53 @@ class Reservas {
 
     public function eliminar($id) {
         try {
-            $stmt = $this->pdo->prepare("DELETE FROM Reservas WHERE id = :id");
-            $stmt->execute([':id' => $id]);
+            $this->pdo->beginTransaction();
+
+            // 1. Obtener la reserva y su id_pago
+            $stmtReserva = $this->pdo->prepare("SELECT id_pagos FROM Reservas WHERE id = :id");
+            $stmtReserva->execute([':id' => $id]);
+            $reserva = $stmtReserva->fetch(PDO::FETCH_ASSOC);
+
+            if (!$reserva) {
+                echo json_encode(['error' => 'Reserva no encontrada']);
+                return;
+            }
+
+            $id_pago = $reserva['id_pagos'];
+
+            // 2. Obtener recursos asociados para restablecer su estado
+            $stmtRecursos = $this->pdo->prepare("SELECT id_recursos FROM Reservas_Recursos WHERE id_reservas = :id_reserva");
+            $stmtRecursos->execute([':id_reserva' => $id]);
+            $recursos = $stmtRecursos->fetchAll(PDO::FETCH_COLUMN);
+
+            // 3. Cambiar estado de los recursos a 'Disponible'
+            if (!empty($recursos)) {
+                $stmtDisponible = $this->pdo->prepare("UPDATE Recursos SET estado = 'Disponible' WHERE id = :id_recurso");
+                foreach ($recursos as $id_recurso) {
+                    $stmtDisponible->execute([':id_recurso' => $id_recurso]);
+                }
+            }
+
+            // 4. Eliminar relaciones con recursos y proveedores
+            $this->pdo->prepare("DELETE FROM Reservas_Recursos WHERE id_reservas = :id_reserva")
+                    ->execute([':id_reserva' => $id]);
+            $this->pdo->prepare("DELETE FROM Reservas_Proveedor WHERE id_reservas = :id_reserva")
+                    ->execute([':id_reserva' => $id]);
+
+            // 5. Eliminar la reserva
+            $this->pdo->prepare("DELETE FROM Reservas WHERE id = :id")
+                    ->execute([':id' => $id]);
+
+            // 6. Eliminar el pago asociado
+            $this->pdo->prepare("DELETE FROM Pagos WHERE id = :id_pago")
+                    ->execute([':id_pago' => $id_pago]);
+
+            $this->pdo->commit();
+
             echo json_encode(['success' => true]);
+
         } catch (PDOException $e) {
+            $this->pdo->rollBack();
             echo json_encode(['error' => $e->getMessage()]);
         }
     }

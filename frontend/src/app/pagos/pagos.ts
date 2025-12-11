@@ -3,8 +3,12 @@ import { Pago } from '../../model/pago.model';
 import { PagosService } from '../../service/pagos.service';
 import { TipoPago } from '../../model/pago.model';
 import { Adelanto } from '../../model/pago.model';
-
+import { Reserva } from '../../model/reserva.model';
+import { ReservasService } from '../../service/reservas.service';
+import { Cliente } from '../../model/cliente.model';
+import { ClientesService } from '../../service/clientes.service';
 import { MessageService } from 'primeng/api';
+  import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-pagos',
@@ -15,304 +19,144 @@ import { MessageService } from 'primeng/api';
 export class Pagos {
 
   pagos: Pago[] = [];
-  pagosFiltrados: Pago[] = [];
-  busqueda: string = '';
-  filtroTipoPago: number | null = null;
+  pagosConInfo: any[] = [];
 
-  // Modales
-  modalVisible: boolean = false;
-  modalEliminarVisible: boolean = false;
-  pagoModal: Pago = {} as Pago;
-  modalTitulo: string = 'Agregar Pago';
+  reservas: Reserva[] = [];
+  clientes: Cliente[] = [];
+  tiposPago: TipoPago[] = [];
+  adelantos: Adelanto[] = [];
 
-  constructor(private pagosService: PagosService, private messageService: MessageService) {}
+  totalRecaudado: number = 0;
+  totalPendiente: number = 0;
+  totalAdelantos: number = 0;
+  totalTransacciones: number = 0;
+
+  constructor(
+    private pagosService: PagosService,
+    private reservasService: ReservasService,
+    private clientesService: ClientesService
+  ) {}
 
   ngOnInit() {
-    this.listarPagos();
-    // Tipo pagos
-    this.listarTipoPagos();
+    forkJoin({
+      reservas: this.reservasService.listar(),
+      clientes: this.clientesService.listar(),
+      pagos: this.pagosService.listar(),
+      tiposPago: this.pagosService.listarTiposPago(),
+      adelantos: this.pagosService.listarAdelantos()
+    }).subscribe(({ reservas, clientes, pagos, tiposPago, adelantos }) => {
+      this.reservas = reservas;
+      this.clientes = clientes;
+      this.pagos = pagos;
+      this.tiposPago = tiposPago;
+      this.adelantos = adelantos;
 
-    // Adelantos
-    this.listarAdelantos();
+      this.completarData(); // Ahora sí con todos los datos cargados
+    });
   }
-  
+
+  listarReservas() {
+    this.reservasService.listar().subscribe(r => this.reservas = r);
+  }
+
+  listarClientes() {
+    this.clientesService.listar().subscribe(c => this.clientes = c);
+  }
+
   listarPagos() {
-    this.pagosService.listar().subscribe(data => {
-      this.pagos = data;
-      this.filtrar();
+    this.pagosService.listar().subscribe(p => {
+      this.pagos = p;
+      this.completarData();
     });
   }
 
-  filtrar() {
-    this.pagosFiltrados = this.pagos.filter(p => {
-      const matchBusqueda = !this.busqueda || 
-        (p.tipo_pago?.toLowerCase().includes(this.busqueda.toLowerCase()) )
-
-      const matchTipo = !this.filtroTipoPago || p.id_tipo_pago === this.filtroTipoPago;
-
-      return matchBusqueda && matchTipo;
-    });
+  listarTiposPago() {
+    this.pagosService.listarTiposPago().subscribe(t => this.tiposPago = t);
   }
-
-  abrirModalAgregar() {
-    this.pagoModal = {} as Pago;
-    this.modalTitulo = 'Agregar Pago';
-    this.modalVisible = true;
-  }
-
-  abrirModalEditar(pago: Pago) {
-    this.pagoModal = { ...pago };
-    this.modalTitulo = 'Editar Pago';
-    this.modalVisible = true;
-  }
-
-  guardarPago() {
-    if (this.pagoModal.id) {
-      this.pagosService.actualizar(this.pagoModal.id, this.pagoModal).subscribe(() => {
-        this.listarPagos();
-        this.modalVisible = false;
-      });
-    } else {
-      this.pagosService.crear(this.pagoModal).subscribe(() => {
-        this.listarPagos();
-        this.modalVisible = false;
-      });
-    }
-  }
-
-  abrirModalEliminar(pago: Pago) {
-    this.pagoModal = { ...pago };
-    this.modalEliminarVisible = true;
-  }
-
-  eliminarPago() {
-    if (this.pagoModal.id) {
-      this.pagosService.eliminar(this.pagoModal.id).subscribe(() => {
-        this.listarPagos();
-        this.modalEliminarVisible = false;
-      });
-    }
-  }
-
-  cerrarModal() { this.modalVisible = false; }
-  cerrarModalEliminar() { this.modalEliminarVisible = false; }
-
-  //================================
-  // Tipo pago
-  //================================
-
-  tipos: TipoPago[] = [];
-  tiposFiltrados: TipoPago[] = [];
-  busquedaTipoPago: string = '';
-
-  // Modales
-  modalTipoPago: boolean= false;
-  modalVisibleTipoPago: boolean = false;
-  modalEliminarVisibleTipoPago: boolean = false;
-  tipoModal: TipoPago = {} as TipoPago;
-  tipoSeleccionado: TipoPago = {} as TipoPago;
-  modalTituloTipoPago: string = 'Agregar Tipo de Pago';
-
-  listarTipoPagos() {
-    this.pagosService.listarTiposPago().subscribe(data => {
-      this.tipos = data;
-      this.filtrarTipos();
-    });
-  }
-
-  filtrarTipos() {
-    this.tiposFiltrados = this.tipos.filter(t =>
-      !this.busquedaTipoPago || t.nombre.toLowerCase().includes(this.busquedaTipoPago.toLowerCase())
-    );
-  }
-  abrirModalTipoPago(){
-    this.modalTipoPago = true;
-  }
-
-  abrirModalAgregarTipoPago() {
-    this.tipoModal = {} as TipoPago;
-    this.modalTitulo = 'Agregar Tipo de Pago';
-    this.modalVisibleTipoPago = true;
-  }
-
-  abrirModalEditarTipoPago(tipo: TipoPago) {
-    this.tipoModal = { ...tipo };
-    this.modalTitulo = 'Editar Tipo de Pago';
-    this.modalVisibleTipoPago = true;
-  }
-
-  guardarTipoPago() {
-    // Validación básica: por ejemplo, que tenga un nombre
-    if (!this.tipoModal.nombre) return;
-
-    if (this.tipoModal.id) {
-      // actualizar
-      this.pagosService.actualizarTipoPago(this.tipoModal.id, this.tipoModal).subscribe({
-        next: () => {
-          this.listarTipoPagos();
-          this.modalVisibleTipoPago = false;
-          this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Tipo de pago actualizado correctamente' });
-        },
-        error: (err) => {
-          console.error(err); // para debug en consola
-
-          const detalles = err?.error?.detalles;
-          if (detalles && detalles.length) {
-            detalles.forEach((msg: string) => {
-              this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
-            });
-          } else {
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Ocurrió un error inesperado' });
-          }
-        }
-      });
-    } else {
-      // crear
-      this.pagosService.crearTipoPago(this.tipoModal).subscribe({
-        next: () => {
-          this.listarTipoPagos();
-          this.modalVisibleTipoPago = false;
-          this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Tipo de pago creado correctamente' });
-        },
-        error: (err) => {
-          console.error(err); // para debug en consola
-
-          const detalles = err?.error?.detalles;
-          if (detalles && detalles.length) {
-            detalles.forEach((msg: string) => {
-              this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
-            });
-          } else {
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Ocurrió un error inesperado' });
-          }
-        }
-      });
-    }
-  }
-
-  abrirModalEliminarTipoPago(tipo: TipoPago) {
-    this.tipoSeleccionado = { ...tipo };
-    this.modalEliminarVisibleTipoPago = true;
-  }
-
-  eliminarTipoPago() {
-    if (this.tipoSeleccionado.id) {
-      this.pagosService.eliminarTipoPago(this.tipoSeleccionado.id).subscribe(() => {
-        this.listarTipoPagos();
-        this.modalEliminarVisibleTipoPago = false;
-      });
-    }
-  }
-
-  cerrarModalTipoPago() { this.modalVisibleTipoPago = false; }
-  cerrarModalEliminarTipoPago() { this.modalEliminarVisibleTipoPago = false; }
-
-  //================================
-  // Adelanto
-  //================================
-
-  adelantos: Adelanto[] = [];
-  adelantosFiltrados: Adelanto[] = [];
-  busquedaAdelanto: string = '';
-
-  // Modales
-  modalAdelanto: boolean= false;
-  modalVisibleAdelanto: boolean = false;
-  modalEliminarVisibleAdelanto: boolean = false;
-  adelantoModal: Adelanto = {} as Adelanto;
-  adelantoSeleccionado: Adelanto = {} as Adelanto;
-  modalTituloAdelanto: string = 'Agregar Adelanto';
 
   listarAdelantos() {
-    this.pagosService.listarAdelantos().subscribe(data => {
-      this.adelantos = data;
-      this.filtrarAdelantos();
-    });
+    this.pagosService.listarAdelantos().subscribe(a => this.adelantos = a);
   }
 
-  filtrarAdelantos() {
-    this.adelantosFiltrados = this.adelantos.filter(a =>
-      !this.busquedaAdelanto || a.valor.toString().includes(this.busquedaAdelanto)
-    );
+  completarData() {
+    this.pagosConInfo = this.pagos
+      .map(p => {
+        // Buscar la reserva que contiene este pago
+        const reserva = this.reservas.find(r => r.id_pagos === p.id);
+        if (!reserva) return null; // ignorar pagos sin reserva
+
+        // Obtener cliente
+        const cliente = this.getCliente(reserva.id_cliente);
+
+        // Tipo de pago
+        const tipoPago = this.getTipoPago(p.id_tipo_pago);
+
+        // Valor del adelanto
+
+        // Adelanto en porcentaje
+        const porcentajeAdelanto = this.getValorAdelanto(p.id_adelanto); // ej: 10, 20, 35
+        const valorAdelanto = reserva.total * (porcentajeAdelanto / 100);
+
+        // Calcular saldo
+        const total = reserva.total ?? 0;
+        // Saldo
+        const saldo = reserva.total - valorAdelanto;
+
+        return {
+          id: p.id,
+          id_reserva: reserva.id,
+          cliente: cliente,
+          total: total,
+          adelanto: valorAdelanto,
+          porcentaje: porcentajeAdelanto,
+          saldo: saldo,
+          metodo: tipoPago,
+          fecha: reserva.fecha,
+          estado: reserva.estado ?? 'N/A'
+        };
+      })
+      .filter(p => p !== null); // eliminar pagos sin reserva
+
+    // Calcular resúmenes
+    this.calcularResumenes();
   }
 
-  abrirModalAdelanto() {
-    this.modalAdelanto = true;
+  getReserva(idReserva: number | undefined): Reserva | undefined {
+    if (!idReserva) return undefined;
+    return this.reservas.find(r => r.id === idReserva);
   }
 
-  abrirModalAgregarAdelanto() {
-    this.adelantoModal = {} as Adelanto;
-    this.modalTituloAdelanto = 'Agregar Adelanto';
-    this.modalVisibleAdelanto = true;
+  getCliente(idCliente: number | undefined): string {
+    if (!idCliente) return 'N/A';
+    const c = this.clientes.find(cl => cl.id === idCliente);
+    return c ? c.nombre : 'N/A';
   }
 
-  abrirModalEditarAdelanto(adelanto: Adelanto) {
-    this.adelantoModal = { ...adelanto };
-    this.modalTituloAdelanto = 'Editar Adelanto';
-    this.modalVisibleAdelanto = true;
+  getTipoPago(idTipo: number | undefined): string {
+    if (!idTipo) return 'N/A';
+    const t = this.tiposPago.find(tp => tp.id === idTipo);
+    return t ? t.nombre : 'N/A';
   }
 
-  guardarAdelanto() {
-    if (this.adelantoModal.id) {
-      // Actualizar
-      this.pagosService.actualizarAdelanto(this.adelantoModal.id, this.adelantoModal).subscribe({
-        next: () => {
-          this.listarAdelantos();
-          this.modalVisibleAdelanto = false;
-          this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Adelanto actualizado correctamente' });
-        },
-        error: (err) => {
-          console.error(err); // Para depuración
-
-          const detalles = err?.error?.detalles;
-          if (detalles && detalles.length) {
-            detalles.forEach((msg: string) => {
-              this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
-            });
-          } else {
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Ocurrió un error inesperado' });
-          }
-        }
-      });
-    } else {
-      // Crear
-      this.pagosService.crearAdelanto(this.adelantoModal).subscribe({
-        next: () => {
-          this.listarAdelantos();
-          this.modalVisibleAdelanto = false;
-          this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Adelanto creado correctamente' });
-        },
-        error: (err) => {
-          console.error(err); // Para depuración
-
-          const detalles = err?.error?.detalles;
-          if (detalles && detalles.length) {
-            detalles.forEach((msg: string) => {
-              this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
-            });
-          } else {
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Ocurrió un error inesperado' });
-          }
-        }
-      });
-    }
+  getValorAdelanto(idAdelanto: number | undefined): number {
+    if (!idAdelanto) return 0;
+    const a = this.adelantos.find(ad => ad.id === idAdelanto);
+    return a ? a.valor : 0;
   }
 
-  abrirModalEliminarAdelanto(adelanto: Adelanto) {
-    this.adelantoSeleccionado = { ...adelanto };
-    this.modalEliminarVisibleAdelanto = true;
-  }
+  calcularResumenes() {
+    this.totalTransacciones = this.pagosConInfo.length;
 
-  eliminarAdelanto() {
-    if (this.adelantoSeleccionado.id) {
-      this.pagosService.eliminarAdelanto(this.adelantoSeleccionado.id).subscribe(() => {
-        this.listarAdelantos();
-        this.modalEliminarVisibleAdelanto = false;
-      });
-    }
-  }
+    // Total de adelantos (sumando todos los adelantos)
+    this.totalAdelantos = this.pagosConInfo.reduce((acc, p) => acc + p.adelanto, 0);
 
-  cerrarModalAdelanto() { this.modalVisibleAdelanto = false; }
-  cerrarModalEliminarAdelanto() { this.modalEliminarVisibleAdelanto = false; }
+    // Total recaudado = sumatoria de adelantos de reservas pagadas
+    this.totalRecaudado = this.pagosConInfo
+      .reduce((acc, p) => acc + p.adelanto, 0);
+
+    // Total pendiente = sumatoria de saldo de reservas que no estén totalmente pagadas
+    this.totalPendiente = this.pagosConInfo
+      .reduce((acc, p) => acc + p.saldo, 0);
+  }
 
 }

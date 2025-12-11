@@ -1,74 +1,92 @@
-<!-- Drawer Izquierdo (Menú lateral) -->
-<p-drawer [visible]="visibleMenuDrawer" [modal]="false" position="left" styleClass="side-drawer" [showCloseIcon]="false" [style]= "{'width': '17%'}">
-    <div style="display: flex; flex-direction: column;">
+<ng-container *ngIf="!isLogged">
+    <router-outlet></router-outlet> <!-- Login u otras rutas públicas -->
+</ng-container>
 
-        <!-- Encabezado fijo arriba -->
-        <div style="padding-bottom: 20px;">
-            <div style="font-weight: bold; font-size: 1.5rem;">
-                Gestor Logo
+<ng-container *ngIf="isLogged">
+    <!-- Drawer Izquierdo (Menú lateral) -->
+    <p-drawer [visible]="visibleMenuDrawer" [modal]="false" position="left" styleClass="side-drawer" [showCloseIcon]="false" [style]= "{'width': '17%'}">
+        <div style="display: flex; flex-direction: column;">
+
+            <!-- Encabezado fijo arriba -->
+            <div style="padding-bottom: 20px;">
+                <div style="font-weight: bold; font-size: 1.5rem;">
+                    Gestor Logo
+                </div>
+            </div>
+            <div class="menu-buttons">
+                <button
+                    *ngFor="let item of menuItems"
+                    pButton
+                    [label]="item.label"
+                    [icon]="item.icon"
+                    class="w-full text-left p-button-text menu-btn"
+                    [ngClass]="{ 'active-btn': activeRoute === item.route }"
+                    (click)="setActive(item.route)"
+                ></button>
             </div>
         </div>
-        <div class="menu-buttons">
-            <button
-                *ngFor="let item of menuItems"
-                pButton
-                [label]="item.label"
-                [icon]="item.icon"
-                class="w-full text-left p-button-text menu-btn"
-                [ngClass]="{ 'active-btn': activeRoute === item.route }"
-                (click)="setActive(item.route)"
-            ></button>
-        </div>
-    </div>
-</p-drawer>
+    </p-drawer>
 
-<!-- Drawer Derecho (Mi Perfil) -->
-<p-drawer [visible]="visibleProfileDrawer" [modal]="true" position="right" styleClass="profile-drawer" [showCloseIcon]="false" (onHide)="visibleProfileDrawer = false">
-<div style="padding: 20px; display: flex; flex-direction: column; height: 100%;">
-    <h2>Mi Perfil</h2>
+    <!-- Drawer Derecho (Mi Perfil) -->
+    <p-drawer [visible]="visibleProfileDrawer" [modal]="true" position="right" styleClass="profile-drawer" [showCloseIcon]="false" (onHide)="visibleProfileDrawer = false">
+    <div style="padding: 20px; display: flex; flex-direction: column; height: 100%;">
+        <h2>Mi Perfil</h2>
 
-    <div style="flex: 1;">
-    <p><strong>Nombre de usuario:</strong></p>
-    <i class="pi pi-check" style="color: slateblue"></i>
+        <div style="flex: 1;">
+            <p><strong>Nombre de usuario:</strong></p>
+            <div style="display: flex;align-items: center; gap: 20px;">
+                <i class="pi pi-check"></i><p>{{ username }}</p>
+            </div>
 
-    
+            <p><strong>Correo:</strong></p>
+            <div style="display: flex;align-items: center; gap: 20px;">
+                <i class="pi pi-check"></i><p>{{ correo }}</p>
+            </div>
 
-    <!-- Aquí puedes agregar más campos de perfil -->
-    
-    </div>
+            <p><strong>Rol:</strong></p>
+            <div style="display: flex;align-items: center; gap: 20px;">
+                <i class="pi pi-check"></i><p>{{ rol }}</p>
+            </div>
+            
 
-    <div style="margin-top: auto; text-align: center;">
-    <button pButton type="button" label="Cerrar sesión" icon="pi pi-sign-out" (click)="cerrarSesion()"></button>
-    </div>
-</div>
-</p-drawer>
-
-<!-- Contenido principal con el botón de 3 rayas y botón de perfil -->
-<div [ngStyle]="{'margin-left': visibleMenuDrawer ? '300px' : '0', 'transition': 'margin-left 0.3s ease'}" style="padding: 20px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1)">
-
-    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
+            <!-- Aquí puedes agregar más campos de perfil -->
         
-        <div style="display: flex; align-items: center; gap: 10px;">
+        </div>
+
+        <div style="margin-top: auto; text-align: center;">
+        <button pButton type="button" label="Cerrar sesión" icon="pi pi-sign-out" (click)="cerrarSesion()"></button>
+        </div>
+    </div>
+    </p-drawer>
+
+    <!-- Contenido principal con el botón de 3 rayas y botón de perfil -->
+    <div [ngStyle]="{'margin-left': visibleMenuDrawer ? '300px' : '0', 'transition': 'margin-left 0.3s ease'}" style="padding: 20px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1)">
+
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
             
-            <!-- Botón menú izquierdo -->
-            <p-button icon="pi pi-bars" label="Menu"(click)="toggleDrawer()" />
-            <!-- Nombre de la opción actual -->
-            <h2>{{ currentLabel }}</h2>
-            
+            <div style="display: flex; align-items: center; gap: 10px;">
+                
+                <!-- Botón menú izquierdo -->
+                <p-button icon="pi pi-bars" label="Menu"(click)="toggleDrawer()" />
+                <!-- Nombre de la opción actual -->
+                <h2>{{ currentLabel }}</h2>
+                
+
+            </div>
+
+            <!-- Botón perfil derecho -->
+            <button 
+                pButton 
+                icon="pi pi-user"
+                class="p-button-lg p-button-rounded"
+                (click)="visibleProfileDrawer = true"
+            ></button>
 
         </div>
 
-        <!-- Botón perfil derecho -->
-        <button 
-            pButton 
-            icon="pi pi-user"
-            class="p-button-lg p-button-rounded"
-            (click)="visibleProfileDrawer = true"
-        ></button>
-
+        <router-outlet></router-outlet>
+        <p-toast></p-toast>
     </div>
-
-    <router-outlet></router-outlet>
-    <p-toast></p-toast>
-
-</div>
+    
+</ng-container>
+    
